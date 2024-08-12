@@ -938,7 +938,12 @@ struct quic_transport_param {
 </ul>
 <t>Handshake Options:</t>
 <ul>
-<li>plpmtud_probe_timeout (in usec): 0 to disable</li>
+<li><t>plpmtud_probe_timeout (in usec):</t>
+  <ul>
+  <li>0 to disable</li>
+  <li>at least QUIC_MIN_PROBE_TIMEOUT (5000000)</li>
+  </ul>
+</li>
 <li>validate_peer_address: For server only; if set, sends a retry packet
 and verifies the token.</li>
 <li>receive_session_ticket: For client only; if set, handshake is complete
