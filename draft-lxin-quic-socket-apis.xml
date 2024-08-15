@@ -350,16 +350,19 @@ ssize_t recv(int sd,
 <t>send() returns the number of bytes accepted by kernel or -1 in
 case of an error.  recv() returns the number of bytes received or
 -1 in case of an error.</t>
-<t>Since ancillary data (msg_control field) cannot be used, the flags will
-function as stream_flag <xref target='struct_stream'/> and msg_flags
-<xref target='struct_msghdr'/>, with the latest opened stream always
-being used as stream_id. See <xref target='struct_msghdr'/></t>
-<t>send() and recv() MUST NOT be used to transmit and receive TLS messages
-as without ancillary data, Handshake Information can be carried.</t>
-<t>Applications can use read() and write() to send and receive data from
-and to a peer. These functions have the same semantics as recv() and
-send(), but offer less functionality, as the flags parameter cannot
-be used.</t>
+<t>As the ancillary data (msg_control field) cannot be used, the flags will
+operate as described in <xref target='struct_msghdr'/>, but without the
+context provided by Stream msg_control. This means that while sending, the
+flags function as intended, but during receiving, users won't be able to
+receive any flags from the kernel, making it impossible to determine the
+end of the stream data.</t>
+<t>Both send() and recv() MUST NOT be used to transmit or receive TLS
+messages because, without ancillary data, Handshake Information cannot be
+carried.</t>
+<t>Alternatively, applications can use read() and write() to transmit and
+receive data to and from a peer. These functions are similar to recv() and
+send() but offer less functionality, as they do not allow the use of a
+flags parameter.</t>
 </section>
 <section title='setsockopt() and getsockopt()'>
 <t>Applications use setsockopt() and getsockopt() to set or retrieve
@@ -446,8 +449,8 @@ ssize_t quic_recvmsg(int sd,
 <li>msg:  The message buffer to be filled.</li>
 <li>len:  The length of the message buffer.</li>
 <li>sid:  stream_id to point for sending or to get for receiving.</li>
-<li>flags:  function as stream_flag <xref target='struct_stream'/> and
-msg_flags <xref target='struct_msghdr'/>.</li>
+<li>flags:  function as stream_flags in <xref target='struct_stream'/> and
+msg_flags/flags in <xref target='struct_msghdr'/>.</li>
 </ul>
 <t>quic_sendmsg() returns the number of bytes accepted by kernel or -1
 in case of an error.  quic_recvmsg() returns the number of bytes received
@@ -473,14 +476,16 @@ int quic_client_handshake(int sd, ...);
 </ul>
 <t>These functions return 0 for success and errcode in case of an
 error.</t>
+
+<ul>
+<li><t>Handling Raw TLS Messages:</t>
 <t>The implementation of these functions SHOULD use sendmsg() and recvmsg()
 with Handshake msg_control <xref target='struct_handshake'/> to send and
 receive raw TLS messages to and from kernel, and exchange them in userspace
-via a TLS library like GnuTLS. They MAY also use sendmsg() and recvmsg()
-with Stream msg_control <xref target='struct_stream'/> to handle early
-or 0-RTT data. </t>
-
-<t>Additionally, they SHOULD use socket options to retrieve handshake
+via a TLS library like GnuTLS.</t>
+</li>
+<li><t>Retrieving and Setting Handshake Parameters:</t>
+<t>The implementation SHOULD use socket options to retrieve handshake
 parameters from kernel for building TLS messages, such as ALPN
 <xref target='sockopt_alpn'/>, TRANSPORT_PARAM
 TRANSPORT_PARAM <xref target='sockopt_transport_param'/>, and
@@ -488,9 +493,23 @@ TRANSPORT_PARAM_EXT <xref target='sockopt_transport_param_ext'/>.
 They SHOULD set handshake parameters in kernel for constructing QUIC
 packets, including TRANSPORT_PARAM_EXT
 <xref target='sockopt_transport_param_ext'/> and CRYPTO_SECRET
-<xref target='sockopt_crypto_secret'/>. These functions MAY support
-session resumption by retrieving the session ticket from kernel using
-socket option SESSION_TICKET <xref target='sockopt_session_ticket'/>.</t>
+<xref target='sockopt_crypto_secret'/>.</t>
+</li>
+<li><t>Session Resumption and Early or 0-RTT Data:</t>
+<t>These functions MAY support session resumption by retrieving the session
+ticket from kernel using socket option SESSION_TICKET
+<xref target='sockopt_session_ticket'/>. They MAY use sendmsg() and
+recvmsg() with Stream msg_control <xref target='struct_stream'/> to handle
+early or 0-RTT data before the completion of the handshake for userspace
+applications.</t>
+<t>However, for kernel consumers, since user data is managed entirely
+within the kernel, early or 0-RTT data SHOULD be buffered using sendmsg()
+before invoking the handshake request to userspace. Additionally, TLS
+session ticket message MUST be handled before user data. Refer to
+receive_session_ticket parameter in socket option TRANSPORT_PARAM
+<xref target='sockopt_transport_param'/>.</t>
+</li>
+</ul>
 </section>
 </section>
 </section>
@@ -533,18 +552,45 @@ and recvmsg().</t>
 communicate the attributes, such as QUIC_STREAM_INFO, of the message
 stored in msg_iov to the socket endpoint.  The different ancillary
 data types are described in <xref target='control_struct'/>.</t>
-<t>On send side, msg_flags might be set to</t>
+<t>On send side:</t>
 <ul>
-<li>MSG_MORE: Indicates that data will be held until the next data is sent
-without this flag.</li>
-<li>MSG_DONTWAIT:  Prevents blocking if there is no send buffer.</li>
-<li>MSG_DATAGRAM:  Sends data as an unreliable datagram.</li>
+<li><t>The flags parameter in sendmsg() can be set to:</t>
+  <ul>
+  <li>MSG_MORE: Indicates that data will be held until the next data is
+  sent without this flag.</li>
+  <li>MSG_DONTWAIT:  Prevents blocking if there is no send buffer.</li>
+  <li>MSG_DATAGRAM:  Sends data as an unreliable datagram.</li>
+  </ul>
+  <t>Additionally, the flags can also be set to the values in stream_flags
+  on send side <xref target='struct_stream'/> if Stream msg_control is not
+  being used. In this case, the most recently opened stream will be used
+  for sending data.</t>
+</li>
+<li><t>msg_flags of msghdr passed to the kernel is ignored.</t></li>
 </ul>
-<t>On receive side, msg_flags might be set to</t>
+<t>On receive side:</t>
 <ul>
-<li>MSG_DATAGRAM:  Indicates that the received data is a datagram.</li>
-<li>MSG_NOTIFICATION:  Indicates that the received data is a notification
-message.</li>
+<li><t>The flags parameter in recvmsg() might be set to:</t>
+  <ul>
+  <li>MSG_DONTWAIT:  Prevents blocking if there is no data in recv
+  buffer.</li>
+  </ul>
+</li>
+<li><t>msg_flags of msghdr returned from the kernel might be set to:</t>
+  <ul>
+  <li>MSG_DATAGRAM:  Indicates that the received data is a datagram.</li>
+  <li>MSG_NOTIFICATION:  Indicates that the received data is a notification
+  message.</li>
+  <li>These flags might also be set to the values in
+  stream_flags on receive side <xref target='struct_stream'/> if Stream
+  msg_control is not being used. In this case, the stream id for received
+  data is invisible to user space.</li>
+  </ul>
+  <t>Additionally, the flags might also be set to the values in
+  stream_flags on receive side <xref target='struct_stream'/> if Stream
+  msg_control is not being used. In this case, the stream ID for received
+  data is not visible to users.</t>
+</li>
 </ul>
 </section>
 
@@ -639,25 +685,51 @@ recvmsg(). It uses struct quic_stream_info</t>
 <sourcecode type='language C'>
 struct quic_stream_info {
   uint64_t stream_id;
-  uint32_t stream_flag;
+  uint32_t stream_flags;
 };
 </sourcecode>
-<t>stream_id: The first 2 bits denote the stream type:</t>
+<t>On send side:</t>
 <ul>
-<li>QUIC_STREAM_TYPE_SERVER_MASK(0x1): Server-side stream.</li>
-<li>QUIC_STREAM_TYPE_UNI_MASK(0x2): Unidirectional stream.</li>
+<li><t>stream_id:</t>
+  <ul>
+  <li><t>-1:</t>
+    <ul>
+    <li>If MSG_STREAM_NEW is set: Open the next bidirectional stream and
+    uses it for sending data.</li>
+    <li>If both MSG_STREAM_NEW and MSG_STREAM_UNI are set: Opens the next
+    unidirectional stream and uses it for sending data.</li>
+    <li>Otherwise: Use the latest opened stream for sending data.</li>
+    </ul>
+  </li>
+  <li><t>!-1: The specified stream ID is used with the 1st 2 bits:</t>
+    <ul>
+    <li>QUIC_STREAM_TYPE_SERVER_MASK(0x1): Indicates if it is a server-side
+    stream.</li>
+    <li>QUIC_STREAM_TYPE_UNI_MASK(0x2): Indicates if it is a unidirectional
+    stream.</li>
+    </ul>
+  </li>
+  </ul>
+</li>
+<li><t>stream_flags:</t>
+  <ul>
+  <li>MSG_STREAM_NEW: Open a stream and send the first data.</li>
+  <li>MSG_STREAM_FIN: Send the last data and close the stream.</li>
+  <li>MSG_STREAM_UNI: Open the next unidirectional stream.</li>
+  <li>MSG_STREAM_DONTWAIT: Open the stream without blocking.</li>
+  </ul>
+</li>
 </ul>
-<t>stream_flag: On send side:</t>
+<t>On receive side:</t>
 <ul>
-<li>MSG_STREAM_NEW: Open a stream and send the first data.</li>
-<li>MSG_STREAM_FIN: Send the last data and close the stream.</li>
-<li>MSG_STREAM_UNI: Open the next unidirectional stream.</li>
-<li>MSG_STREAM_DONTWAIT: Open the stream without blocking.</li>
-</ul>
-<t>stream_flag: On receive side:</t>
-<ul>
-<li>MSG_STREAM_FIN: Indicates that the data received is the last one for
-this stream.</li>
+<li><t>stream_id: Identifies the stream to which the received data
+  belongs.</t></li>
+<li><t>stream_flags:</t>
+  <ul>
+  <li>MSG_STREAM_FIN: Indicates that the data received is the last one for
+  this stream.</li>
+  </ul>
+</li>
 </ul>
 <t>This cmsg is specifically used for sending user stream data, including
 early or 0-RTT data. When sending user unreliable datagrams, this cmsg
@@ -686,9 +758,9 @@ struct quic_handshake_info {
 
 <section title='QUIC Events and Notifications'>
 <t>A QUIC application MAY need to understand and process events and errors
-that occur within the QUIC stack. These events include stream updates and
-max_stream changes, connection close and migration, key updates, and
-new tokens</t>
+that occur within the QUIC stack, such as stream updates, max_stream
+changes, connection close, connection migration, key updates and new
+tokens. These events are categorized under the quic_event_type enum:</t>
 <sourcecode type='language C'>
 enum quic_event_type {
   QUIC_EVENT_NONE,
@@ -703,8 +775,12 @@ enum quic_event_type {
 <t>When a notification arrives, recvmsg() returns the notification in the
 application-supplied data buffer via msg_iov, and sets MSG_NOTIFICATION
 in msg_flags of msghdr in <xref target='struct_stream'/>.</t>
-<t>See socket option EVENT <xref target='sockopt_event'/> for the event
-enabling.</t>
+<t>The first byte of the received data indicates the type of the event,
+corresponding to one of the values in the quic_event_type enum. The
+subsequent bytes contain the content of the event, meaning the length of
+the content is the total data length minus one byte. To manage and enable
+these events, refer to socket option EVENT
+<xref target='sockopt_event'/>.</t>
 <section title='QUIC Notification Structure' anchor='notification'>
 <section title='QUIC_EVENT_STREAM_UPDATE'>
 <t>Only notifications with one of the following states are delivered to
@@ -759,8 +835,8 @@ struct quic_stream_update {
 </section>
 <section title='QUIC_EVENT_STREAM_MAX_STREAM'>
 <t>This notification is delivered when a MAX_STREAMS frame is received. It
-is particularly useful when using MSG_STREAM_DONTWAIT stream_flag to open a
-stream via socket option STREAM_OPEN <xref target='sockopt_stream_open'/>
+is particularly useful when using MSG_STREAM_DONTWAIT stream_flags to open
+a stream via socket option STREAM_OPEN <xref target='sockopt_stream_open'/>
 whose ID exceeds the current maximum stream count. After receiving this
 notification, the application SHOULD attempt to open the stream again.</t>
 <t>Data format in the event</t>
@@ -868,7 +944,7 @@ communicate the closing information to the peer.</li>
 <li>On the receiving side: Get this option to retrieve the closing
 information from the peer.</li>
 </ul>
-<t>the optval type is</t>
+<t>The optval type is</t>
 <sourcecode type='language C'>
 struct quic_connection_close {
   uint32_t errcode;
@@ -887,7 +963,7 @@ struct quic_connection_close {
 <t>This option is used to configure transport parameters, including both
 the original QUIC transport parameters and some handshake-specific
 options.</t>
-<t>the optval type is</t>
+<t>The optval type is</t>
 <sourcecode type='language C'>
 struct quic_transport_param {
   uint8_t     remote;
@@ -944,18 +1020,35 @@ struct quic_transport_param {
   <li>at least QUIC_MIN_PROBE_TIMEOUT (5000000)</li>
   </ul>
 </li>
-<li>validate_peer_address: For server only; if set, sends a retry packet
-and verifies the token.</li>
-<li>receive_session_ticket: For client only; if set, handshake is complete
-only when a ticket is received.</li>
-<li><t>certificate_request: For server only; can be set to:</t>
+<li><t>validate_peer_address: Server-side only:</t>
+<t>If this option is enabled, server will send a retry packet to client
+upon receiving the first handshake request. This serves to validate
+client's IP address, ensuring it is legitimate and reachable before
+proceeding with the rest of the handshake.</t>
+</li>
+<li><t>receive_session_ticket: Client-side only:</t>
+<t>If this option is enabled, client will not deliver user data to
+userspace until TLS session ticket message is received. This ensures
+userspace handshake to complete with TLS session ticket message processed
+and resumption ticket to set back to kernel before kernel consumers
+receives any user data. If this option is not set, TLS session ticket
+message will be dropped.</t>
+</li>
+<li><t>certificate_request: Server-side only, options include:</t>
   <ul>
   <li>0: IGNORE</li>
   <li>1: REQUEST</li>
   <li>2: REQUIRE</li>
   </ul>
 </li>
-<li>congestion_control_alg: Congestion control algorithm.</li>
+<li><t>congestion_control_alg:Congestion control algorithm,
+options MAY include:</t>
+  <ul>
+  <li>NEW_RENO</li>
+  <li>CUBIC</li>
+  <li>BBR</li>
+  </ul>
+</li>
 <li><t>payload_cipher_type: Cipher type for payload encryption,
 options include:</t>
   <ul>
@@ -993,7 +1086,7 @@ on the client side or the server side.</t>
   <t>The token can be obtained from the server during the previous
   connection, either via getsockopt() with this option or from event
   NEW_TOKEN <xref target='event_new_token' />.</t>
-  <t>the optval type is</t>
+  <t>The optval type is</t>
   <sourcecode type='language C'>
   uint8_t *opt;
   </sourcecode>
@@ -1002,7 +1095,7 @@ on the client side or the server side.</t>
   <t>The server uses this option to issue a new token to the client. This
   token will be used by the client for address verification in the next
   connection.</t>
-  <t>the optval type is null.</t>
+  <t>The optval type is null.</t>
 </li>
 </ul>
 <t>The default value in socket is null.</t>
@@ -1144,7 +1237,7 @@ connection.</t>
 <sourcecode type='language C'>
 struct quic_stream_info {
   uint64_t stream_id;
-  uint32_t stream_flag;
+  uint32_t stream_flags;
 };
 </sourcecode>
 <ul>
@@ -1156,7 +1249,7 @@ struct quic_stream_info {
   returned to the user via the stream_id field after the operation.</li>
   </ul>
 </li>
-<li><t>stream_flag: Specifies flags for stream creation.
+<li><t>stream_flags: Specifies flags for stream creation.
   It can be set to:</t>
   <ul>
   <li>QUIC_STREAM_UNI: Open the next unidirectional stream.</li>
