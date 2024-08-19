@@ -317,9 +317,7 @@ Handshake msg_control <xref target='struct_handshake'/> to send raw TLS
 messages to and receive from kernel, and to exchange TLS messages in
 userspace with the help of a third-party TLS library, such as GnuTLS.
 A pair of high-level APIs MAY be defined to wrap the handshake process
-in userspace. A pair of high level APIs MAY be defined to wrap the
-handshake process in userspace.
-See <xref target='advanced_handshake'/>.</t>
+in userspace. See <xref target='advanced_handshake'/>.</t>
 <t>Post Handshake, users SHOULD use sendmsg() and recvmsg() with Stream
 msg_control <xref target='struct_stream'/> to send data msgs to and
 receive from kernel with stream_id and stream_flags. One pair of high
@@ -477,6 +475,8 @@ int quic_client_handshake(int sd, ...);
 <t>These functions return 0 for success and errcode in case of an
 error.</t>
 
+<t>Implementation guidelines for handling TLS and QUIC communications
+between kernel and userspace:</t>
 <ul>
 <li><t>Handling Raw TLS Messages:</t>
 <t>The implementation of these functions SHOULD use sendmsg() and recvmsg()
@@ -845,9 +845,6 @@ uint64_t max_stream;
 </sourcecode>
 </section>
 <section title='QUIC_EVENT_CONNECTION_CLOSE'>
-<t>This notification is delivered when receiving a CLOSE frame from the
-peer where it can set the close info with <xref target='sockopt_close'/>
-socket option.</t>
 <t>This notification is delivered when a CLOSE frame is received from the
 peer. The peer MAY set the close information via socket option
 CONNECTION_CLOSE <xref target='sockopt_close'/> before calling close().</t>
@@ -861,11 +858,6 @@ struct quic_connection_close {
 </sourcecode>
 </section>
 <section title='QUIC_EVENT_CONNECTION_MIGRATION'>
-<t>This notification is delivered when either side successfully changes its
-source address by <xref target='sockopt_migration'/> socket option or
-dest address by the peer's CONNECTION_MIGRATION. The parameter tells you
-if it is a local or peer CONNECTION_MIGRATION, and then you can get the
-new address with getsockname() or getpeername(). </t>
 <t>This notification is delivered when either side successfully changes its
 source address using the socket option CONNECTION_MIGRATION
 <xref target='sockopt_migration'/>, or when the destination address is
@@ -936,8 +928,6 @@ to <xref target='sockopt_event'/>.</t>
 errcode and phrase and frame. On close side, set it before calling close()
 to tell the peer the closing info, while on being closed side get it to
 show the peer closing info.</t>
-<t>This option is used to get or set the close context, which includes the
-error code, phrase, and frame information.</t>
 <ul>
 <li>On the closing side: Set this option before calling close() to
 communicate the closing information to the peer.</li>
@@ -1030,9 +1020,9 @@ proceeding with the rest of the handshake.</t>
 <t>If this option is enabled, client will not deliver user data to
 userspace until TLS session ticket message is received. This ensures
 userspace handshake to complete with TLS session ticket message processed
-and resumption ticket to set back to kernel before kernel consumers
-receives any user data. If this option is not set, TLS session ticket
-message will be dropped.</t>
+and resumption ticket set back to kernel before kernel consumers receives
+any user data. If this option is not set, TLS session ticket message will
+be dropped.</t>
 </li>
 <li><t>certificate_request: Server-side only, options include:</t>
   <ul>
@@ -1041,7 +1031,7 @@ message will be dropped.</t>
   <li>2: REQUIRE</li>
   </ul>
 </li>
-<li><t>congestion_control_alg:Congestion control algorithm,
+<li><t>congestion_control_alg: Congestion control algorithm,
 options MAY include:</t>
   <ul>
   <li>NEW_RENO</li>
@@ -1116,14 +1106,17 @@ protocols.</t>
   The ALPNs MUST be set on the socket before calling listen() to enable
   this functionality.</t>
   <t>On a accepting socket, the server sets the ALPNs it supports before
-  the handshake begins, othersize, it uses the ALPNs from the listening
+  the handshake begins, otherwise, it uses the ALPNs from the listening
   socket.</t>
 </li>
 </ul>
-<t>Both sides retrieve the ALPN sent by the peer and attempts to match
-it with one of the ALPNs set on the socket during handshake.</t>
-<t>Both sides set the matched ALPN on the socket after handshake,
-allowing users to retrieve the selected ALPN via this option.</t>
+<t>During the handshake process, both client and server retrieve the ALPNs
+sent by the peer and attempt to match them with one of the ALPNs set on
+the socket prior to the handshake.</t>
+<t>Once a match is found, the matched ALPN is set on the socket after the
+handshake is completed. This allows users to retrieve the selected ALPN via
+the appropriate socket option, enabling the application to identify which
+protocol has been successfully negotiated.</t>
 <t>The optval type is</t>
 <sourcecode type='language C'>
 char *alpn;
@@ -1152,7 +1145,7 @@ session with the server.</t>
 <li><t>Server-Side Usage:</t>
   <t>The server does not use this option to set or process a session
   resumption ticket.</t>
-  <t>Note the session resumption ticket SHOULD be issue via sendmsg with
+  <t>The session resumption ticket SHOULD be issued via sendmsg() with
   crypto_level QUIC_CRYPTO_APP in Handshake msg_control
   <xref target='struct_handshake'/>.</t>
   <t>The optval type is null.</t>
@@ -1196,7 +1189,8 @@ struct quic_crypto_secret {
   </ul>
 </li>
 <li><t>secret: The cryptographic key material to be used. The length of
-  this array depends on the type and SHOULD be filled accordingly.</t>
+  this array depends on the type and SHOULD be filled accordingly in
+  kernel.</t>
 </li>
 </ul>
 <t>This option is only relevant during the handshake phase.</t>
@@ -1295,7 +1289,7 @@ struct quic_errinfo {
 <ul>
 <li>stream_id: Specifies the ID of the stream to be reset.</li>
 <li>errcode: An application protocol error code indicating the reason for
-the stream reset.</li>
+the stream stop_sending.</li>
 </ul>
 </section>
 <section title='QUIC_SOCKOPT_CONNECTION_MIGRATION'
@@ -1926,11 +1920,11 @@ the design architecture for handling QUIC handshakes in Linux kernel:</t>
  {send/recvmsg()}      {set/getsockopt()}          │    tlshd    │
  [CMSG handshake_info] [SOCKOPT_CRYPTO_SECRET]     └─────────────┘
                        [SOCKOPT_TRANSPORT_PARAM_EXT]    │   ^
-              │ ^                    │ ^                │   │
-Userspace     │ │                    │ │                │   │
-──────────────│─│────────────────────│─│────────────────│───│────────
-Kernel        │ │                    │ │                │   │
-              v │                    v │                v   │
+              │ ^                  │ ^                  │   │
+Userspace     │ │                  │ │                  │   │
+──────────────│─│──────────────────│─│──────────────────│───│────────
+Kernel        │ │                  │ │                  │   │
+              v │                  v │                  v   │
 ┌──────────────────────────────────────────┐       ┌─────────────┐
 │ socket (IPPROTO_QUIC) |     protocol     │&lt;──┐   │ handshake   │
 ├──────────────────────────────────────────┤   │   │netlink APIs │
