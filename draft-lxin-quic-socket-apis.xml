@@ -29,6 +29,18 @@
     <email>lucien.xin@gmail.com</email>
   </address>
 </author>
+<author fullname='Moritz Buhl' initials='M.' role='editor' surname='Buhl'>
+  <organization>Technical University of Munich</organization>
+  <address>
+    <postal>
+      <street>Boltzmannstrasse 3</street>
+      <city>Garching</city>
+      <code>85748</code>
+      <country>Germany</country>
+    </postal>
+    <email>ietf@moritzbuhl.de</email>
+  </address>
+</author>
 
 <date year='2024'/>
 
