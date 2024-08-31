@@ -147,7 +147,8 @@ implementation.</t>
 <t>The function returns a socket descriptor or -1 in case of an error.
 Using the PF_INET domain indicates the creation of an endpoint that MUST
 use only IPv4 addresses, while PF_INET6 creates an endpoint that MAY use
-both IPv6 and IPv4 addresses.</t>
+both IPv6 and IPv4 addresses. See <xref target='RFC3493' section='3.7'/>.
+</t>
 </section>
 <section title='bind()'>
 <t>Applications use bind() to specify with which local address and port
