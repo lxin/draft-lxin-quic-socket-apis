@@ -428,17 +428,32 @@ supplied sockaddr structure, the stored address will be truncated.</t>
 <t>An application uses quic_sendmsg() and quic_recvmsg() calls to
 transmit data to and receive data from its peer with stream_id and
 flags.</t>
-<t>The function prototypes are</t>
+<t>The function prototype of quic_sendmsg() is</t>
 <sourcecode type='language C'>
 ssize_t quic_sendmsg(int sd,
                      const void *msg,
                      size_t len,
-                     uint64_t sid,
+                     int64_t sid,
                      uint32_t flags);
+</sourcecode>
+<t>and the arguments are</t>
+<ul>
+<li>sd:  The socket descriptor.</li>
+<li>msg:  The message buffer to be filled.</li>
+<li>len:  The length of the message buffer.</li>
+<li>sid:  stream_id to point for sending.</li>
+<li>flags:  function as stream_flags in <xref target='struct_stream'/> and
+msg_flags/flags in <xref target='struct_msghdr'/>.</li>
+</ul>
+<t>quic_sendmsg() returns the number of bytes accepted by kernel or -1
+in case of an error.</t>
+
+<t>The function prototype of quic_recvmsg() is</t>
+<sourcecode type='language C'>
 ssize_t quic_recvmsg(int sd,
                      void *msg,
                      size_t len,
-                     uint64_t *sid,
+                     int64_t *sid,
                      uint32_t *flags);
 </sourcecode>
 <t>and the arguments are</t>
@@ -446,68 +461,92 @@ ssize_t quic_recvmsg(int sd,
 <li>sd:  The socket descriptor.</li>
 <li>msg:  The message buffer to be filled.</li>
 <li>len:  The length of the message buffer.</li>
-<li>sid:  stream_id to point for sending or to get for receiving.</li>
+<li>sid:  stream_id to point for receiving.</li>
 <li>flags:  function as stream_flags in <xref target='struct_stream'/> and
 msg_flags/flags in <xref target='struct_msghdr'/>.</li>
 </ul>
-<t>quic_sendmsg() returns the number of bytes accepted by kernel or -1
-in case of an error.  quic_recvmsg() returns the number of bytes received
-or -1 in case of an error.</t>
-<t>These functions wrap the sendmsg() and recvmsg() with Stream information
-msg_control, and are important for using QUIC multiple streams. See an
-example in <xref target='example_stream'/></t>
+<t>quic_recvmsg() returns the number of bytes received or -1 in case of
+an error.</t>
+<t>These two functions wrap the sendmsg() and recvmsg() with Stream
+information msg_control, and are important for using QUIC multiple
+streams. See an example in <xref target='example_stream'/></t>
 </section>
-<section title='quic_client_handshake() and quic_server_handshake()'
+<section title='quic_client/server_handshake()'
   anchor='advanced_handshake'>
 <t>An application uses quic_client_handshake() or quic_server_handshake()
 to initiate a QUIC handshake, either with Certificate or PSK mode, from
 the client or server side..</t>
-<t>The function prototypes are</t>
+<t>The function prototype of quic_server_handshake() is:</t>
 <sourcecode type='language C'>
-int quic_server_handshake(int sd, ...);
-int quic_client_handshake(int sd, ...);
+int quic_server_handshake(int sd,
+                          const char *pkey_file,
+                          const char *cert_file,
+                          const char *alpns);
 </sourcecode>
 <t>and the arguments are</t>
 <ul>
 <li>sd:  The socket descriptor.</li>
-<li>...:  Additional arguments, implementation-specific.</li>
+<li>pkey_file:  Private key file for Certificate mode or pre-shared
+key file for PSK mode.</li>
+<li>cert_file:  Certificate file for Certificate mode or null for
+PSK mode.</li>
+<li>alpns: ALPNs supported and split by ','.</li>
+</ul>
+<t>The function prototype of quic_client_handshake() is:</t>
+<sourcecode type='language C'>
+int quic_client_handshake(int sd,
+                          const char *pkey_file,
+                          const char *hostname,
+                          const char *alpns);
+</sourcecode>
+<t>and the arguments are</t>
+<ul>
+<li>sd:  The socket descriptor.</li>
+<li>psk_file: Pre-shared key file for PSK mode.</li>
+<li>hostname: Server name for Certificate mode.</li>
+<li>alpns: ALPNs supported and split by ','.</li>
 </ul>
 <t>These functions return 0 for success and errcode in case of an
 error.</t>
-
-<t>Implementation guidelines for handling TLS and QUIC communications
-between kernel and userspace:</t>
+</section>
+<section title='quic_handshake()' anchor='advanced_do_handshake'>
+<t>Using quic_handshake() allows an application to have greater control
+over the configuration of the handshake session.</t>
+<t>The function prototype is</t>
+<sourcecode type='language C'>
+int quic_handshake(void *session);
+</sourcecode>
+<t>and the arguments are</t>
+<ul>
+<li>session: A TLS session, which is represented differently across
+various TLS libraries, such as gnutls_session_t in GnuTLS or SSL * in
+OpenSSL.</li>
+</ul>
+<t>With the session argument, users can configure additional parameters at
+TLS level and define custom client_handshake() and server_handshake()
+functions. An example is provided in
+<xref target='example_early_handshake'/>.</t>
+<t>In the future, quic_handshake() MAY be considered for integration into
+these TLS libraries to provide comprehensive support for QUIC stack.</t>
+<t>Here are some guidelines for handling TLS and QUIC communications
+between kernel and userspace when implement quic_handshake():</t>
 <ul>
 <li><t>Handling Raw TLS Messages:</t>
-<t>The implementation of these functions SHOULD use sendmsg() and recvmsg()
-with Handshake msg_control <xref target='struct_handshake'/> to send and
-receive raw TLS messages to and from kernel, and exchange them in userspace
-via a TLS library like GnuTLS.</t>
+<t>The implementation SHOULD utilize sendmsg() and recvmsg() with Handshake
+msg_control <xref target='struct_handshake'/> to send and receive raw TLS
+messages between kernel and userspace. These messages should be processed
+in userspace using a TLS library, such as GnuTLS.</t>
 </li>
-<li><t>Retrieving and Setting Handshake Parameters:</t>
-<t>The implementation SHOULD use socket options to retrieve handshake
-parameters from kernel for building TLS messages, such as ALPN
-<xref target='sockopt_alpn'/>, TRANSPORT_PARAM
-TRANSPORT_PARAM <xref target='sockopt_transport_param'/>, and
-TRANSPORT_PARAM_EXT <xref target='sockopt_transport_param_ext'/>.
-They SHOULD set handshake parameters in kernel for constructing QUIC
-packets, including TRANSPORT_PARAM_EXT
-<xref target='sockopt_transport_param_ext'/> and CRYPTO_SECRET
-<xref target='sockopt_crypto_secret'/>.</t>
+<li><t>Processing TLS QUIC Transport Parameters Extension:</t>
+<t>The implementation SHOULD retrieve local TLS QUIC transport parameters
+extension from the kernel using socket option
+TRANSPORT_PARAM_EXT <xref target='sockopt_transport_param_ext'/> for
+building TLS messages. Additionally, remote handshake parameters should
+be set in kernel using the same socket option for constructing QUIC packets.</t>
 </li>
-<li><t>Session Resumption and Early or 0-RTT Data:</t>
-<t>These functions MAY support session resumption by retrieving the session
-ticket from kernel using socket option SESSION_TICKET
-<xref target='sockopt_session_ticket'/>. They MAY use sendmsg() and
-recvmsg() with Stream msg_control <xref target='struct_stream'/> to handle
-early or 0-RTT data before the completion of the handshake for userspace
-applications.</t>
-<t>However, for kernel consumers, since user data is managed entirely
-within the kernel, early or 0-RTT data SHOULD be buffered using sendmsg()
-before invoking the handshake request to userspace. Additionally, TLS
-session ticket message MUST be handled before user data. Refer to
-receive_session_ticket parameter in socket option TRANSPORT_PARAM
-<xref target='sockopt_transport_param'/>.</t>
+<li><t>Setting Secrets for Different Crypto Levels:</t>
+<t>The implementation SHOULD set secrets for various crypto levels using
+socket option CRYPTO_SECRET <xref target='sockopt_crypto_secret'/>.</t>
 </li>
 </ul>
 </section>
@@ -746,7 +785,6 @@ struct quic_handshake_info {
 </sourcecode>
 <t>crypto_level: Specifies the level of data:</t>
 <ul>
-<li>QUIC_CRYPTO_APP: Resumption ticket data.</li>
 <li>QUIC_CRYPTO_INITIAL: Initial level data.</li>
 <li>QUIC_CRYPTO_HANDSHAKE: Handshake level data.</li>
 </ul>
@@ -770,6 +808,7 @@ enum quic_event_type {
   QUIC_EVENT_CONNECTION_MIGRATION,
   QUIC_EVENT_KEY_UPDATE,
   QUIC_EVENT_NEW_TOKEN,
+  QUIC_EVENT_NEW_SESSION_TICKET,
 };
 </sourcecode>
 <t>When a notification arrives, recvmsg() returns the notification in the
@@ -890,6 +929,15 @@ tokens using socket option TOKEN <xref target='sockopt_new_token'/>.</t>
 uint8_t *token;
 </sourcecode>
 </section>
+<section title='QUIC_EVENT_NEW_SESSION_TICKET'
+  anchor='event_new_session_ticket'>
+<t>This notification is delivered whenever a NEW_SESSION_TICKET message
+carried in crypto frame is received from the peer.</t>
+<t>Data format in the event</t>
+<sourcecode type='language C'>
+uint8_t *ticket;
+</sourcecode>
+</section>
 </section>
 
 <section title='Notification Interest Options'>
@@ -948,16 +996,12 @@ struct quic_connection_close {
 <li>frame: Frame type that caused the closure. Defaults to 0.</li>
 </ul>
 </section>
-<section title='QUIC_SOCKOPT_TRANSPORT_PARAM'
-  anchor='sockopt_transport_param'>
-<t>This option is used to configure transport parameters, including both
-the original QUIC transport parameters and some handshake-specific
-options.</t>
+<section title='QUIC_SOCKOPT_TRANSPORT_PARAM'>
+<t>This option is used to configure QUIC transport parameters.</t>
 <t>The optval type is</t>
 <sourcecode type='language C'>
 struct quic_transport_param {
   uint8_t     remote;
-
   uint8_t     disable_active_migration; // 0 by default
   uint8_t     grease_quic_bit; // 0
   uint8_t     stateless_reset; // 0
@@ -975,93 +1019,106 @@ struct quic_transport_param {
   uint64_t    max_stream_data_uni; // 65536 * 4
   uint64_t    max_streams_bidi; // 100
   uint64_t    max_streams_uni; // 100
-  uint64_t    initial_smoothed_rtt; // 333000
-
-  uint32_t    plpmtud_probe_timeout; // 0 (in usec)
-  uint8_t     validate_peer_address; // 0
-  uint8_t     receive_session_ticket; // 0
-  uint8_t     certificate_request; // 0
-  uint8_t     congestion_control_alg; // QUIC_CONG_ALG_RENO
-  uint32_t    payload_cipher_type; // 0
-  uint32_t    version; // QUIC_VERSION_V1
 };
 </sourcecode>
-<t>Transport Parameters from <xref target='RFC9000'/>:</t>
+<t>These parameters and descripted in <xref target='RFC9000'/>
+and their default values are specified in the struct code.</t>
+<t>The remote member allows users to set remote transport parameters.
+When used in conjunction with session resumption ticket, it enables the
+configuration of remote transport parameters from the previous connection.
+This configuration is crucial for sending 0-RTT data efficiently.</t>
+</section>
+<section title='QUIC_SOCKOPT_CONFIG' anchor='sockopt_config'>
+<t>This option is used to configure various settings for QUIC connection,
+and also includes some handshake-specific options for kernel consumers.</t>
+<t>The optval type is</t>
+<sourcecode type='language C'>
+struct quic_config {
+  uint32_t    version;
+  uint32_t    plpmtud_probe_timeout;
+  uint64_t    initial_smoothed_rtt;
+  uint8_t     congestion_control_algo;
+  uint8_t     validate_peer_address;
+  uint32_t    payload_cipher_type;
+  uint8_t     receive_session_ticket;
+  uint8_t     certificate_request;
+};
+</sourcecode>
 <ul>
-<li>max_udp_payload_size</li>
-<li>ack_delay_exponent</li>
-<li>max_ack_delay</li>
-<li>active_connection_id_limit</li>
-<li>max_idle_timeout</li>
-<li>max_datagram_frame_size</li>
-<li>max_data</li>
-<li>max_stream_data_bidi_local</li>
-<li>max_stream_data_bidi_remote</li>
-<li>max_stream_data_uni</li>
-<li>max_streams_bidi</li>
-<li>max_streams_uni</li>
-<li>initial_smoothed_rtt</li>
-</ul>
-<t>Handshake Options:</t>
-<ul>
-<li><t>plpmtud_probe_timeout (in usec):</t>
+<li><t>version:</t>
+  <t>QUIC version, options include:</t>
   <ul>
-  <li>0 to disable</li>
-  <li>at least QUIC_MIN_PROBE_TIMEOUT (5000000)</li>
+  <li>QUIC_VERSION_V1 (by default)</li>
+  <li>QUIC_VERSION_V2</li>
   </ul>
 </li>
-<li><t>validate_peer_address: Server-side only:</t>
-<t>If this option is enabled, server will send a retry packet to client
-upon receiving the first handshake request. This serves to validate
-client's IP address, ensuring it is legitimate and reachable before
-proceeding with the rest of the handshake.</t>
-</li>
-<li><t>receive_session_ticket: Client-side only:</t>
-<t>If this option is enabled, client will not deliver user data to
-userspace until TLS session ticket message is received. This ensures
-userspace handshake to complete with TLS session ticket message processed
-and resumption ticket set back to kernel before kernel consumers receives
-any user data. If this option is not set, TLS session ticket message will
-be dropped.</t>
-</li>
-<li><t>certificate_request: Server-side only, options include:</t>
+<li><t>plpmtud_probe_interval (in usec):</t>
+  <t>The probe interval of Packetization Layer Path MTU Discovery.
+  options include:</t>
   <ul>
-  <li>0: IGNORE</li>
-  <li>1: REQUEST</li>
-  <li>2: REQUIRE</li>
+  <li>0: disabled (by default)</li>
+  <li>!0: at least QUIC_MIN_PROBE_TIMEOUT (5000000)</li>
   </ul>
 </li>
-<li><t>congestion_control_alg: Congestion control algorithm,
-options MAY include:</t>
+<li><t>initial_smoothed_rtt (in usec):</t>
+  <t>The initial smoothed rtt, options include:</t>
   <ul>
-  <li>NEW_RENO</li>
+  <li>333000 (by default)</li>
+  <li>at least QUIC_RTO_MIN (100000)</li>
+  <li>less than QUIC_RTO_MAX (6000000)</li>
+  </ul>
+</li>
+<li><t>congestion_control_algo:</t>
+  <t>Congestion control algorithm, options MAY include:</t>
+  <ul>
+  <li>NEW_RENO (by default)</li>
   <li>CUBIC</li>
   <li>BBR</li>
   </ul>
 </li>
-<li><t>payload_cipher_type: Cipher type for payload encryption,
-options include:</t>
+<li><t>validate_peer_address:</t>
+  <t>This option is Server-side only, and if it is enabled, server will
+  send a retry packet to client upon receiving the first handshake request.
+  This serves to validate client's IP address, ensuring it is legitimate
+  and reachable before proceeding with the rest of the handshake.</t>
   <ul>
+  <li>0: disabled (by default)</li>
+  <li>!0: enabled</li>
+  </ul>
+</li>
+<li><t>payload_cipher_type:</t>
+  <t> This option is for kernel consumers only, allowing them to inform
+  userspace handshake of the preferred cipher type, options include:</t>
+  <ul>
+  <li>0: any type (by default)</li>
   <li>AES_GCM_128</li>
   <li>AES_GCM_256</li>
   <li>AES_CCM_128</li>
   <li>CHACHA20_POLY1305</li>
   </ul>
 </li>
-<li><t>version: QUIC version, options include:</t>
+<li><t>receive_session_ticket (in sec):</t>
+  <t>This option is for Client-side kernel consumers only, enabling
+  userspace handshake to receive session ticket, either via event
+  NEW_SESSION_TICKET <xref target='event_new_session_ticket'/> or socket
+  option SESSION_TICKET <xref target='sockopt_session_ticket'/> and then
+  set back to kernel via socket option SESSION_TICKET.</t>
   <ul>
-  <li>QUIC_VERSION_V1</li>
-  <li>QUIC_VERSION_V2</li>
+  <li>0: disabled (by default)</li>
+  <li>!0: maximum time (in sec) to wait</li>
+  </ul>
+</li>
+<li><t>certificate_request:</t>
+  <t>This option is Server-side kernel consumers only, instructing
+  userspace handshake whether to request a certificate from client,
+  options include:</t>
+  <ul>
+  <li>0: IGNORE (by default)</li>
+  <li>1: REQUEST</li>
+  <li>2: REQUIRE</li>
   </ul>
 </li>
 </ul>
-<t>Others:</t>
-<ul>
-<li>remote: Allows users to set remote transport parameters. Together with
-the session resumption ticket, it is used to set the remote transport
-parameters from the last connection before sending 0-RTT data.</li>
-</ul>
-<t>All members have default values as specified in the struct code.</t>
 </section>
 <section title='QUIC_SOCKOPT_TOKEN' anchor='sockopt_new_token'>
 <t>This option is used to manage tokens for address verification in QUIC
@@ -1091,32 +1148,23 @@ on the client side or the server side.</t>
 <t>The default value in socket is null.</t>
 </section>
 <section title='QUIC_SOCKOPT_ALPN' anchor='sockopt_alpn'>
-<t>This socket option is used to set or retrieve the ALPN identifiers
-before or after a QUIC handshake. ALPN is critical for selecting the
-protocol used over a QUIC connection, such as HTTP/3, SMB, or custom
-protocols.</t>
+<t>This option is used on listening sockets for kernel ALPN routing.
+On regular sockets, it allows kernel consumers to communicate ALPN
+identifiers with userspace handshake.</t>
 <ul>
-<li><t>Client-Side Usage:</t>
-  <t>The client sets the desired ALPNs before the handshake. Multiple ALPNs
-  can be specified, separated by commas (e.g., "smbd,h3,ksmbd").</t>
+<li><t>On regular sockets:</t>
+  <t>It sets the desired ALPNs before kernel consumers send handshake
+  requests to userspace. Multiple ALPNs can be specified, separated by
+  commas (e.g., "smbd,h3,ksmbd"). Userspace handshake SHOULD return the
+  selected ALPN to kernel via this socket option.</t>
 </li>
-<li><t>Server-Side Usage:</t>
-  <t>On a listening socket if kernel supports ALPN matching, this feature
-  directs incoming requests to the appropriate application based on ALPNs.
-  The ALPNs MUST be set on the socket before calling listen() to enable
-  this functionality.</t>
-  <t>On a accepting socket, the server sets the ALPNs it supports before
-  the handshake begins, otherwise, it uses the ALPNs from the listening
-  socket.</t>
+<li><t>On listening socket:</t>
+  <t>If kernel supports ALPN routing, this feature directs incoming
+  requests to the appropriate application based on ALPNs. The ALPNs
+  MUST be set on the socket before calling listen() to enable this
+  functionality.</t>
 </li>
 </ul>
-<t>During the handshake process, both client and server retrieve the ALPNs
-sent by the peer and attempt to match them with one of the ALPNs set on
-the socket prior to the handshake.</t>
-<t>Once a match is found, the matched ALPN is set on the socket after the
-handshake is completed. This allows users to retrieve the selected ALPN via
-the appropriate socket option, enabling the application to identify which
-protocol has been successfully negotiated.</t>
 <t>The optval type is</t>
 <sourcecode type='language C'>
 char *alpn;
@@ -1125,32 +1173,33 @@ char *alpn;
 </section>
 <section title='QUIC_SOCKOPT_SESSION_TICKET'
   anchor='sockopt_session_ticket'>
-<t>This socket option is used to set a session resumption ticket on the
-client side, enabling the client to resume a previously established QUIC
-session with the server.</t>
+<t>This option is used on listening sockets to retrieve the key for
+enabling the session tickets on server. On regular sockets, it can be
+used to receive the session ticket message on client. It is also used
+by client-side kernel consumers to communicate session data with
+userspace handshake.</t>
 <ul>
-<li><t>Client-Side Usage:</t>
-  <t>The client uses this option to set a session resumption ticket before
-  initiating a new connection. The ticket, usually issued by the peer
-  during the last connection, facilitates session resumption and helps
-  to re-establish the connection more efficiently.</t>
-  <t>The ticket value is obtained from the previous connection, typically
-  via the getsockopt call with this option.</t>
-  <t>The optval type is</t>
-  <sourcecode type='language C'>
-  uint8_t *opt;
-  </sourcecode>
-  <t>See an example in <xref target='example_early'/></t>
+<li><t>For userspace handshake:</t>
+  <t>On server side, userspace handshake requires a key to enable
+  session ticket, this key SHOULD be retrieved via this socket option.</t>
+  <t>On client side, userspace handshake can receive NEW_SESSION_TICKET
+  messages via this socket option from kernel to generate session data
+  while processing this message.</t>
+  <t>See an example in <xref target='example_early'/>.</t>
 </li>
-<li><t>Server-Side Usage:</t>
-  <t>The server does not use this option to set or process a session
-  resumption ticket.</t>
-  <t>The session resumption ticket SHOULD be issued via sendmsg() with
-  crypto_level QUIC_CRYPTO_APP in Handshake msg_control
-  <xref target='struct_handshake'/>.</t>
-  <t>The optval type is null.</t>
+<li><t>For kernel consumers:</t>
+  <t>After userspace handshake handles NEW_SESSION_TICKET messages, it
+  MUST return session data to kernel via this socket option, and kernel
+  consumers can get it via this socket option for session resumption
+  in future connections.</t>
+  <t>During session resumption, kernel consumers will use this socket
+  option to inform userspace handshake about session data.</t>
 </li>
 </ul>
+<t>The optval type is</t>
+<sourcecode type='language C'>
+uint8_t *opt;
+</sourcecode>
 <t>The default value in socket is null.</t>
 </section>
 <section title='QUIC_SOCKOPT_CRYPTO_SECRET' anchor='sockopt_crypto_secret'>
@@ -1422,7 +1471,8 @@ static int do_client(int argc, char *argv[])
     char msg[50];
 
     if (argc &lt; 3) {
-        printf("%s client &lt;PEER ADDR> &lt;PEER PORT>\n", argv[0]);
+        printf("%s client &lt;PEER ADDR> &lt;PEER PORT> [ALPN]\n",
+               argv[0]);
         return 0;
     }
 
@@ -1441,10 +1491,14 @@ static int do_client(int argc, char *argv[])
         return -1;
     }
 
-    if (quic_client_handshake(sockfd, NULL, NULL))
+    if (quic_client_handshake(sockfd, NULL, NULL, argv[4]))
         return -1;
 
-    /* Open stream 0 and send first data on stream 0 */
+    /* Open stream 0 and send first data on stream 0 with
+     * MSG_STREAM_NEW, or call getsockopt(QUIC_SOCKOPT_STREAM_OPEN)
+     * to open a stream and then send data with out MSG_STREAM_NEW
+     * needed
+     */
     strcpy(msg, "hello ");
     sid = 0;
     flags = MSG_STREAM_NEW;
@@ -1477,7 +1531,9 @@ static int do_client(int argc, char *argv[])
     }
     stream[sid >> 1].len += ret;
 
-    /* Send second (last) data on stream 2 */
+    /* Send second (last) data on stream 2 and then close stream
+     * 2 with MSG_STREAM_FIN
+     */
     strcpy(msg, "server stream 2!");
     sid = 2;
     flags = MSG_STREAM_FIN;
@@ -1529,7 +1585,8 @@ static int do_server(int argc, char *argv[])
 
     if (argc &lt; 5) {
         printf("%s server &lt;LOCAL ADDR> &lt;LOCAL PORT>"
-               "&lt;PRIVATE_KEY_FILE> &lt;CERTIFICATE_FILE>\n", argv[0]);
+               "&lt;PRIVATE_KEY_FILE> &lt;CERTIFICATE_FILE> [ALPN]\n",
+               argv[0]);
         return 0;
     }
 
@@ -1556,7 +1613,7 @@ static int do_server(int argc, char *argv[])
         return -1;
     }
 
-    if (quic_server_handshake(sockfd, argv[4], argv[5]))
+    if (quic_server_handshake(sockfd, argv[4], argv[5], argv[6]))
         return -1;
 
     while (!(stream[0].flags &amp; MSG_STREAM_FIN) ||
@@ -1609,11 +1666,248 @@ int main(int argc, char *argv[])
 </sourcecode>
 </section>
 
+<section
+  title='Example For defining custom client/server_handshake()'
+  anchor='example_early_handshake'>
+<t>This example demonstrates how to use quic_handshake() to define
+client_handshake() and server_handshake() for session resumption using
+GnuTLS.</t>
+<sourcecode type='language C'>
+#include &lt;sys/socket.h>
+#include &lt;arpa/inet.h>
+#include &lt;string.h>
+#include &lt;unistd.h>
+#include &lt;stdlib.h>
+#include &lt;stdio.h>
+#include &lt;errno.h>
+
+#include &lt;netinet/quic.h>
+
+static int quic_session_get_data(gnutls_session_t session,
+                                 void *data, size_t *size)
+{
+    int ret, sockfd = gnutls_transport_get_int(session);
+    unsigned int len = *size;
+
+    if (getsockopt(sockfd, SOL_QUIC, QUIC_SOCKOPT_SESSION_TICKET,
+                   data, &amp;len))
+        return -errno;
+    if (!len) {
+        *size = 0;
+        return 0;
+    }
+
+    ret = quic_handshake_process(session, QUIC_CRYPTO_APP,
+                                 data, len);
+    if (ret)
+        return ret;
+    return gnutls_session_get_data(session, data, size);
+}
+
+static int quic_session_set_data(gnutls_session_t session,
+                                 const void *data, size_t size)
+{
+    return gnutls_session_set_data(session, data, size);
+}
+
+static int quic_session_get_alpn(gnutls_session_t session,
+                                 void *alpn, size_t *size)
+{
+    gnutls_datum_t alpn_data;
+    int ret;
+
+    ret = gnutls_alpn_get_selected_protocol(session, &amp;alpn_data);
+    if (ret)
+        return ret;
+
+    if (*size &lt; alpn_data.size)
+        return -EINVAL;
+
+    memcpy(alpn, alpn_data.data, alpn_data.size);
+    *size = alpn_data.size;
+    return 0;
+}
+
+static int quic_session_set_alpn(gnutls_session_t session,
+                                 const void *alpns, size_t size)
+{
+    gnutls_datum_t alpn_data[5];
+    char *s, data[64] = {};
+    int count = 0;
+
+    if (size >= 64)
+        return -EINVAL;
+
+    memcpy(data, alpns, size);
+    s = strtok(data, ",");
+    while (s) {
+        while (*s == ' ')
+            s++;
+        alpn_data[count].data = (unsigned char *)s;
+        alpn_data[count].size = strlen(s);
+        count++;
+        s = strtok(NULL, ",");
+    }
+
+    return gnutls_alpn_set_protocols(session, alpn_data, count,
+                                     GNUTLS_ALPN_MANDATORY);
+}
+
+static int client_handshake(int sockfd, const char *alpns,
+                            const uint8_t *ticket_in,
+                            size_t ticket_in_len,
+                            uint8_t *ticket_out,
+                            size_t *ticket_out_len)
+{
+    gnutls_certificate_credentials_t cred;
+    gnutls_session_t session;
+    size_t alpn_len;
+    char alpn[64];
+    int ret;
+
+    ret = gnutls_certificate_allocate_credentials(&amp;cred);
+    if (ret)
+        goto err;
+    ret = gnutls_certificate_set_x509_system_trust(cred);
+    if (ret &lt; 0)
+        goto err_cred;
+
+    ret = gnutls_init(&amp;session, GNUTLS_CLIENT |
+                                    GNUTLS_ENABLE_EARLY_DATA |
+                                    GNUTLS_NO_END_OF_EARLY_DATA);
+    if (ret)
+        goto err_cred;
+    ret = gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
+                                 cred);
+    if (ret)
+        goto err_session;
+
+    ret = gnutls_priority_set_direct(session, QUIC_PRIORITY, NULL);
+    if (ret)
+        goto err_session;
+
+    if (alpns) {
+        ret = quic_session_set_alpn(session, alpns, strlen(alpns));
+        if (ret)
+            goto err_session;
+    }
+
+    if (host) {
+        ret = gnutls_server_name_set(session, GNUTLS_NAME_DNS, host,
+                                     strlen(host));
+        if (ret)
+            goto err_session;
+    }
+
+    gnutls_transport_set_int(session, sockfd);
+
+    if (ticket_in) {
+        ret = quic_session_set_data(session, ticket_in,
+                                    ticket_in_len);
+        if (ret)
+            goto err_session;
+    }
+
+    ret = quic_handshake(session);
+    if (ret)
+        goto err_session;
+
+    if (alpns) {
+        alpn_len = sizeof(alpn);
+        ret = quic_session_get_alpn(session, alpn, &amp;alpn_len);
+        if (ret)
+            goto err_session;
+    }
+
+    if (ticket_out) {
+        sleep(1);
+        ret = quic_session_get_data(session, ticket_out,
+                                    ticket_out_len);
+        if (ret)
+            goto err_session;
+    }
+
+err_session:
+    gnutls_deinit(session);
+err_cred:
+    gnutls_certificate_free_credentials(cred);
+err:
+    return ret;
+}
+
+static int server_handshake(int sockfd, const char *pkey,
+                            const char *cert, const char *alpns,
+                            uint8_t *key, unsigned int keylen)
+{
+    gnutls_certificate_credentials_t cred;
+    gnutls_datum_t skey = {key, keylen};
+    gnutls_session_t session;
+    size_t alpn_len;
+    char alpn[64];
+    int ret;
+
+    ret = gnutls_certificate_allocate_credentials(&amp;cred);
+    if (ret)
+        goto err;
+    ret = gnutls_certificate_set_x509_system_trust(cred);
+    if (ret &lt; 0)
+        goto err_cred;
+    ret = gnutls_certificate_set_x509_key_file(cred, cert, pkey,
+                                               GNUTLS_X509_FMT_PEM);
+    if (ret)
+        goto err_cred;
+    ret = gnutls_init(&amp;session, GNUTLS_SERVER |
+                                    GNUTLS_NO_AUTO_SEND_TICKET |
+                                    GNUTLS_ENABLE_EARLY_DATA |
+                                    GNUTLS_NO_END_OF_EARLY_DATA);
+    if (ret)
+        goto err_cred;
+    ret = gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
+                                 cred);
+    if (ret)
+        goto err_session;
+
+    ret = gnutls_session_ticket_enable_server(session, &amp;skey);
+    if (ret)
+        goto err_session;
+
+    ret = gnutls_priority_set_direct(session, QUIC_PRIORITY, NULL);
+    if (ret)
+        goto err_session;
+
+    if (alpns) {
+        ret = quic_session_set_alpn(session, alpns, strlen(alpns));
+        if (ret)
+            goto err_session;
+    }
+
+    gnutls_transport_set_int(session, sockfd);
+
+    ret = quic_handshake(session);
+    if (ret)
+        goto err_session;
+
+    if (alpns) {
+        alpn_len = sizeof(alpn);
+        ret = quic_session_get_alpn(session, alpn, &amp;alpn_len);
+    }
+
+err_session:
+    gnutls_deinit(session);
+err_cred:
+    gnutls_certificate_free_credentials(cred);
+err:
+    return ret;
+}
+</sourcecode>
+</section>
+
 <section title='Example For Session Consumption and 0-RTT transmission'
- anchor='example_early'>
+  anchor='example_early'>
 <t>This example illustrates how to use the socket options TOKEN,
 SESSION_TICKET, and TRANSPORT_PARAM to achieve session resumption
-and 0-RTT data transmission with QUIC.</t>
+and 0-RTT data transmission with QUIC (client_handshake() and
+server are from <xref target='example_early_handshake'/>).</t>
 <sourcecode type='language C'>
 #include &lt;sys/socket.h>
 #include &lt;arpa/inet.h>
@@ -1630,14 +1924,17 @@ static uint8_t token[256];
 
 static int do_client(int argc, char *argv[])
 {
-    unsigned int ticket_len, param_len, token_len, addr_len;
+    unsigned int param_len, token_len, addr_len, flags;
     struct quic_transport_param param = {};
     struct sockaddr_in ra = {}, la = {};
+    char msg[50], *alpn;
+    size_t ticket_len;
     int ret, sockfd;
-    char msg[50];
+    int64_t sid;
 
     if (argc &lt; 3) {
-        printf("%s client &lt;PEER ADDR> &lt;PEER PORT>\n", argv[0]);
+        printf("%s client &lt;PEER ADDR> &lt;PEER PORT> [ALPN]\n",
+               argv[0]);
         return 0;
     }
 
@@ -1656,26 +1953,14 @@ static int do_client(int argc, char *argv[])
         return -1;
     }
 
-    param.receive_session_ticket = 1;
-    param_len = sizeof(param);
-    ret = setsockopt(sockfd, SOL_QUIC, QUIC_SOCKOPT_TRANSPORT_PARAM,
-                     &amp;param, param_len);
-    if (ret == -1)
-        return -1;
-
-    if (quic_client_handshake(sockfd, NULL, NULL))
-        return -1;
-
-    /* get ticket and param after handshake (you can save
-     * it somewhere).
+    /* get ticket and param after handshake
+     * (you can save it somewhere).
      */
+    alpn = argv[4];
     ticket_len = sizeof(ticket);
-    ret = getsockopt(sockfd, SOL_QUIC, QUIC_SOCKOPT_SESSION_TICKET,
-                     ticket, &amp;ticket_len);
-    if (ret == -1 || !ticket_len) {
-        printf("socket getsockopt session ticket\n");
+    if (client_handshake(sockfd, alpn, NULL, NULL, ticket,
+                         &amp;ticket_len))
         return -1;
-    }
 
     param_len = sizeof(param);
     param.remote = 1;
@@ -1686,9 +1971,6 @@ static int do_client(int argc, char *argv[])
         return -1;
     }
 
-    /* get token and local address (needed when peer
-     * validate_address is set).
-     */
     token_len = sizeof(token);
     ret = getsockopt(sockfd, SOL_QUIC, QUIC_SOCKOPT_TOKEN, &amp;token,
                      &amp;token_len);
@@ -1708,20 +1990,23 @@ static int do_client(int argc, char *argv[])
            "token %d, save it\n", ticket_len, param_len, token_len);
 
     strcpy(msg, "hello quic server!");
-    ret = send(sockfd, msg, strlen(msg), MSG_SYN | MSG_FIN);
+    sid = (0 | QUIC_STREAM_TYPE_UNI_MASK);
+    flags = MSG_STREAM_NEW | MSG_STREAM_FIN;
+    ret = quic_sendmsg(sockfd, msg, strlen(msg), sid, flags);
     if (ret == -1) {
         printf("send error %d %d\n", ret, errno);
         return -1;
     }
-    printf("send %d\n", ret);
+    printf("send '%s' on stream %ld\n", msg, sid);
 
     memset(msg, 0, sizeof(msg));
-    ret = recv(sockfd, msg, sizeof(msg), 0);
+    flags = 0;
+    ret = quic_recvmsg(sockfd, msg, sizeof(msg) - 1, &amp;sid, &amp;flags);
     if (ret == -1) {
         printf("recv error %d %d\n", ret, errno);
         return 1;
     }
-    printf("recv: \"%s\", len: %d\n", msg, ret);
+    printf("recv '%s' on stream %ld\n", msg, sid);
 
     close(sockfd);
 
@@ -1734,17 +2019,11 @@ static int do_client(int argc, char *argv[])
         return -1;
     }
 
-    /* bind previous address and port and set token for
-     * address validation.
+    /* bind previous address:port and set token for address
+     * validation
      */
     if (bind(sockfd, (struct sockaddr *)&amp;la, addr_len)) {
         printf("socket bind failed\n");
-        return -1;
-    }
-    ret = setsockopt(sockfd, SOL_QUIC, QUIC_SOCKOPT_TOKEN, token,
-                     token_len);
-    if (ret == -1) {
-        printf("socket setsockopt token\n");
         return -1;
     }
 
@@ -1760,36 +2039,43 @@ static int do_client(int argc, char *argv[])
     /* set the ticket and remote param and early data into
      * the socket for handshake.
      */
-    ret = setsockopt(sockfd, SOL_QUIC, QUIC_SOCKOPT_SESSION_TICKET,
-                     ticket, ticket_len);
+    ret = setsockopt(sockfd, SOL_QUIC, QUIC_SOCKOPT_TOKEN, token,
+                     token_len);
     if (ret == -1) {
-        printf("socket setsockopt session ticket\n");
+        printf("socket setsockopt token\n");
         return -1;
     }
+
     ret = setsockopt(sockfd, SOL_QUIC, QUIC_SOCKOPT_TRANSPORT_PARAM,
                      &amp;param, param_len);
     if (ret == -1) {
         printf("socket setsockopt remote transport param\n");
         return -1;
     }
+
+    /* send early data before handshake */
     strcpy(msg, "hello quic server, I'm back!");
-    ret = send(sockfd, msg, strlen(msg), MSG_SYN | MSG_FIN);
+    sid = (0 | QUIC_STREAM_TYPE_UNI_MASK);
+    flags = MSG_STREAM_NEW | MSG_STREAM_FIN;
+    ret = quic_sendmsg(sockfd, msg, strlen(msg), sid, flags);
     if (ret == -1) {
         printf("send error %d %d\n", ret, errno);
         return -1;
     }
-    printf("send %d\n", ret);
+    printf("send '%s' on stream %ld\n", msg, sid);
 
-    if (quic_client_handshake(sockfd, NULL, NULL))
+    if (client_handshake(sockfd, alpn, ticket, ticket_len, NULL,
+                         NULL))
         return -1;
 
     memset(msg, 0, sizeof(msg));
-    ret = recv(sockfd, msg, sizeof(msg), 0);
+    flags = 0;
+    ret = quic_recvmsg(sockfd, msg, sizeof(msg) - 1, &amp;sid, &amp;flags);
     if (ret == -1) {
         printf("recv error %d %d\n", ret, errno);
         return 1;
     }
-    printf("recv: \"%s\", len: %d\n", msg, ret);
+    printf("recv '%s' on stream %ld\n", msg, sid);
 
     close(sockfd);
     return 0;
@@ -1797,15 +2083,18 @@ static int do_client(int argc, char *argv[])
 
 static int do_server(int argc, char *argv[])
 {
-    struct quic_transport_param param = {};
+    unsigned int addrlen, keylen, flags;
+    struct quic_config config = {};
     struct sockaddr_in sa = {};
     int listenfd, sockfd, ret;
-    unsigned int addrlen;
-    char msg[50];
+    char msg[50], *alpn;
+    uint8_t key[64];
+    int64_t sid;
 
     if (argc &lt; 5) {
-        printf("%s server &lt;LOCAL ADDR> &lt;LOCAL PORT>"
-               "&lt;PRIVATE_KEY_FILE> &lt;CERTIFICATE_FILE>\n", argv[0]);
+        printf("%s server &lt;LOCAL ADDR> &lt;LOCAL PORT> "
+               "&lt;PRIVATE_KEY_FILE> &lt;CERTIFICATE_FILE>\n",
+               argv[0]);
         return 0;
     }
 
@@ -1821,14 +2110,22 @@ static int do_server(int argc, char *argv[])
         printf("socket bind failed\n");
         return -1;
     }
+    alpn = argv[6];
+    if (alpn &amp;&amp; setsockopt(listenfd, SOL_QUIC, QUIC_SOCKOPT_ALPN,
+                           alpn, strlen(alpn))) {
+        printf("socket setsockopt alpn failed\n");
+        return -1;
+    }
+
     if (listen(listenfd, 1)) {
         printf("socket listen failed\n");
         return -1;
     }
-    param.validate_peer_address = 1;
-    if (setsockopt(listenfd, SOL_QUIC, QUIC_SOCKOPT_TRANSPORT_PARAM,
-                   &amp;param, sizeof(param)))
+    config.validate_peer_address = 1; /* trigger retry packet */
+    if (setsockopt(listenfd, SOL_QUIC, QUIC_SOCKOPT_CONFIG, &amp;config,
+                   sizeof(config)))
         return -1;
+
     addrlen = sizeof(sa);
     sockfd = accept(listenfd, (struct sockaddr *)&amp;sa, &amp;addrlen);
     if (sockfd &lt; 0) {
@@ -1836,24 +2133,35 @@ static int do_server(int argc, char *argv[])
         return -1;
     }
 
-    if (quic_server_handshake(sockfd, argv[4], argv[5]))
+    keylen = sizeof(key);
+    if (getsockopt(sockfd, SOL_QUIC, QUIC_SOCKOPT_SESSION_TICKET,
+                   key, &amp;keylen)) {
+        printf("socket getsockopt session ticket error %d", errno);
+        return -1;
+    }
+
+    if (server_handshake(sockfd, argv[4], argv[5], alpn, key,
+                         keylen))
         return -1;
 
     memset(msg, 0, sizeof(msg));
-    ret = recv(sockfd, msg, sizeof(msg), 0);
+    flags = 0;
+    ret = quic_recvmsg(sockfd, msg, sizeof(msg) - 1, &amp;sid, &amp;flags);
     if (ret == -1) {
         printf("recv error %d %d\n", ret, errno);
         return 1;
     }
-    printf("recv: \"%s\", len: %d\n", msg, ret);
+    printf("recv '%s' on stream %ld\n", msg, sid);
 
     strcpy(msg, "hello quic client!");
-    ret = send(sockfd, msg, strlen(msg), MSG_SYN | MSG_FIN);
+    sid = (0 | QUIC_STREAM_TYPE_SERVER_MASK);
+    flags = MSG_STREAM_NEW | MSG_STREAM_FIN;
+    ret = quic_sendmsg(sockfd, msg, strlen(msg), sid, flags);
     if (ret == -1) {
         printf("send error %d %d\n", ret, errno);
         return -1;
     }
-    printf("send %d\n", ret);
+    printf("send '%s' on stream %ld\n", msg, sid);
 
     close(sockfd);
 
@@ -1866,24 +2174,28 @@ static int do_server(int argc, char *argv[])
         return -1;
     }
 
-    if (quic_server_handshake(sockfd, argv[4], argv[5]))
+    if (server_handshake(sockfd, argv[4], argv[5], alpn, key,
+                         keylen))
         return -1;
 
     memset(msg, 0, sizeof(msg));
-    ret = recv(sockfd, msg, sizeof(msg), 0);
+    flags = 0;
+    ret = quic_recvmsg(sockfd, msg, sizeof(msg) - 1, &amp;sid, &amp;flags);
     if (ret == -1) {
         printf("recv error %d %d\n", ret, errno);
         return 1;
     }
-    printf("recv: \"%s\", len: %d\n", msg, ret);
+    printf("recv '%s' on stream %ld\n", msg, sid);
 
     strcpy(msg, "hello quic client! welcome back!");
-    ret = send(sockfd, msg, strlen(msg), MSG_SYN | MSG_FIN);
+    sid = (0 | QUIC_STREAM_TYPE_SERVER_MASK);
+    flags = MSG_STREAM_NEW | MSG_STREAM_FIN;
+    ret = quic_sendmsg(sockfd, msg, strlen(msg), sid, flags);
     if (ret == -1) {
         printf("send error %d %d\n", ret, errno);
         return -1;
     }
-    printf("send %d\n", ret);
+    printf("send '%s' on stream %ld\n", msg, sid);
 
     close(sockfd);
     close(listenfd);
@@ -1892,8 +2204,8 @@ static int do_server(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-    if (argc &lt; 2 || (strcmp(argv[1], "server") &amp;&amp;
-        strcmp(argv[1], "client"))) {
+    if (argc &lt; 2 ||
+        (strcmp(argv[1], "server") &amp;&amp; strcmp(argv[1], "client"))) {
         printf("%s server|client ...\n", argv[0]);
         return 0;
     }

@@ -13,12 +13,12 @@ for TCP applications, access to new QUIC features, and a consolidated
 error and event notification scheme. In-kernel QUIC enables usage for
 both userspace applications and kernel consumers. 
     " name="description">
-<meta content="xml2rfc 3.22.0" name="generator">
+<meta content="xml2rfc 3.23.0" name="generator">
 <meta content="QUIC socket APIs" name="keyword">
 <meta content="draft-lxin-quic-socket-apis-00" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.22.0
-    Python 3.9.19
+  xml2rfc 3.23.0
+    Python 3.10.12
     ConfigArgParse 1.7
     google-i18n-address 3.1.0
     intervaltree 3.1.0
@@ -26,12 +26,14 @@ both userspace applications and kernel consumers.
     lxml 4.9.4
     platformdirs 4.2.2
     pycountry 24.6.1
-    PyYAML 5.4.1
-    requests 2.25.1
-    setuptools 53.0.0
+    pydyf 0.10.0
+    PyYAML 6.0.2
+    requests 2.32.3
+    setuptools 59.6.0
     wcwidth 0.2.13
+    weasyprint 61.2
 -->
-<link href="./draft-lxin-quic-socket-apis.xml" rel="alternate" type="application/rfc+xml">
+<link href="/usr/src/app/tmp/9e21981d-adff-4cb4-bdf4-82dd42f4221c/draft-lxin-quic-socket-apis.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
 <style type="text/css">/*
 
@@ -1162,7 +1164,7 @@ section .olCompact {
 tt, code {
   background-color: transparent;
 }
-p tt, p code, li tt, li code {
+p tt, p code, li tt, li code, dt tt, dt code {
   background-color: #f8f8f8;
 }
 /* Tweak the pre margin -- 0px doesn't come out well */
@@ -1206,6 +1208,7 @@ li > p:last-of-type:only-child {
 }
 </style>
 <link href="rfc-local.css" rel="stylesheet" type="text/css">
+<script type="application/javascript">async function addMetadata(){try{const e=document.styleSheets[0].cssRules;for(let t=0;t<e.length;t++)if(/#identifiers/.exec(e[t].selectorText)){const a=e[t].cssText.replace("#identifiers","#external-updates");document.styleSheets[0].insertRule(a,document.styleSheets[0].cssRules.length)}}catch(e){console.log(e)}const e=document.getElementById("external-metadata");if(e)try{var t,a="",o=function(e){const t=document.getElementsByTagName("meta");for(let a=0;a<t.length;a++)if(t[a].getAttribute("name")===e)return t[a].getAttribute("content");return""}("rfc.number");if(o){t="https://www.rfc-editor.org/rfc/rfc"+o+".json";try{const e=await fetch(t);a=await e.json()}catch(e){t=document.URL.indexOf("html")>=0?document.URL.replace(/html$/,"json"):document.URL+".json";const o=await fetch(t);a=await o.json()}}if(!a)return;e.style.display="block";const s="",d="https://datatracker.ietf.org/doc",n="https://datatracker.ietf.org/ipr/search",c="https://www.rfc-editor.org/info",l=a.doc_id.toLowerCase(),i=a.doc_id.slice(0,3).toLowerCase(),f=a.doc_id.slice(3).replace(/^0+/,""),u={status:"Status",obsoletes:"Obsoletes",obsoleted_by:"Obsoleted By",updates:"Updates",updated_by:"Updated By",see_also:"See Also",errata_url:"Errata"};let h="<dl style='overflow:hidden' id='external-updates'>";["status","obsoletes","obsoleted_by","updates","updated_by","see_also","errata_url"].forEach(e=>{if("status"==e){a[e]=a[e].toLowerCase();var t=a[e].split(" "),o=t.length,w="",p=1;for(let e=0;e<o;e++)p<o?w=w+r(t[e])+" ":w+=r(t[e]),p++;a[e]=w}else if("obsoletes"==e||"obsoleted_by"==e||"updates"==e||"updated_by"==e){var g,m="",b=1;g=a[e].length;for(let t=0;t<g;t++)a[e][t]&&(a[e][t]=String(a[e][t]).toLowerCase(),m=b<g?m+"<a href='"+s+"/rfc/".concat(a[e][t])+"'>"+a[e][t].slice(3)+"</a>, ":m+"<a href='"+s+"/rfc/".concat(a[e][t])+"'>"+a[e][t].slice(3)+"</a>",b++);a[e]=m}else if("see_also"==e){var y,L="",C=1;y=a[e].length;for(let t=0;t<y;t++)if(a[e][t]){a[e][t]=String(a[e][t]);var _=a[e][t].slice(0,3),v=a[e][t].slice(3).replace(/^0+/,"");L=C<y?"RFC"!=_?L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+_+" "+v+"</a>, ":L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+v+"</a>, ":"RFC"!=_?L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+_+" "+v+"</a>":L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+v+"</a>",C++}a[e]=L}else if("errata_url"==e){var R="";R=a[e]?R+"<a href='"+a[e]+"'>Errata exist</a> | <a href='"+d+"/"+l+"'>Datatracker</a>| <a href='"+n+"/?"+i+"="+f+"&submit="+i+"'>IPR</a> | <a href='"+c+"/"+l+"'>Info page</a>":"<a href='"+d+"/"+l+"'>Datatracker</a> | <a href='"+n+"/?"+i+"="+f+"&submit="+i+"'>IPR</a> | <a href='"+c+"/"+l+"'>Info page</a>",a[e]=R}""!=a[e]?"Errata"==u[e]?h+=`<dt>More info:</dt><dd>${a[e]}</dd>`:h+=`<dt>${u[e]}:</dt><dd>${a[e]}</dd>`:"Errata"==u[e]&&(h+=`<dt>More info:</dt><dd>${a[e]}</dd>`)}),h+="</dl>",e.innerHTML=h}catch(e){console.log(e)}else console.log("Could not locate metadata <div> element");function r(e){return e.charAt(0).toUpperCase()+e.slice(1)}}window.removeEventListener("load",addMetadata),window.addEventListener("load",addMetadata);</script>
 </head>
 <body class="xml2rfc">
 <script src="metadata.min.js"></script>
@@ -1213,11 +1216,11 @@ li > p:last-of-type:only-child {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">QUIC socket APIs</td>
-<td class="right">August 2024</td>
+<td class="right">September 2024</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Xin</td>
-<td class="center">Expires 20 February 2025</td>
+<td class="center">Expires 5 March 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1230,12 +1233,12 @@ li > p:last-of-type:only-child {
 <dd class="internet-draft">draft-lxin-quic-socket-apis-00</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-08-19" class="published">19 August 2024</time>
+<time datetime="2024-09-01" class="published">1 September 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-02-20">20 February 2025</time></dd>
+<dd class="expires"><time datetime="2025-03-05">5 March 2025</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1274,7 +1277,7 @@ both userspace applications and kernel consumers.<a href="#section-abstract-1" c
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 20 February 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 5 March 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1362,7 +1365,10 @@ both userspace applications and kernel consumers.<a href="#section-abstract-1" c
                     <p id="section-toc.1-1.3.2.2.2.1.1"><a href="#section-3.2.1" class="auto internal xref">3.2.1</a>.  <a href="#name-quic_sendmsg-and-quic_recvm" class="internal xref">quic_sendmsg() and quic_recvmsg()</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.2">
-                    <p id="section-toc.1-1.3.2.2.2.2.1"><a href="#section-3.2.2" class="auto internal xref">3.2.2</a>.  <a href="#name-quic_client_handshake-and-q" class="internal xref">quic_client_handshake() and quic_server_handshake()</a></p>
+                    <p id="section-toc.1-1.3.2.2.2.2.1"><a href="#section-3.2.2" class="auto internal xref">3.2.2</a>.  <a href="#name-quic_client-server_handshak" class="internal xref">quic_client/server_handshake()</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.3">
+                    <p id="section-toc.1-1.3.2.2.2.3.1"><a href="#section-3.2.3" class="auto internal xref">3.2.3</a>.  <a href="#name-quic_handshake" class="internal xref">quic_handshake()</a></p>
 </li>
                 </ul>
 </li>
@@ -1425,6 +1431,9 @@ both userspace applications and kernel consumers.<a href="#section-abstract-1" c
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1.2.6">
                     <p id="section-toc.1-1.5.2.1.2.6.1"><a href="#section-5.1.6" class="auto internal xref">5.1.6</a>.  <a href="#name-quic_event_new_token" class="internal xref">QUIC_EVENT_NEW_TOKEN</a></p>
 </li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1.2.7">
+                    <p id="section-toc.1-1.5.2.1.2.7.1"><a href="#section-5.1.7" class="auto internal xref">5.1.7</a>.  <a href="#name-quic_event_new_session_tick" class="internal xref">QUIC_EVENT_NEW_SESSION_TICKET</a></p>
+</li>
                 </ul>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
@@ -1453,19 +1462,22 @@ both userspace applications and kernel consumers.<a href="#section-abstract-1" c
                     <p id="section-toc.1-1.6.2.1.2.3.1"><a href="#section-6.1.3" class="auto internal xref">6.1.3</a>.  <a href="#name-quic_sockopt_transport_para" class="internal xref">QUIC_SOCKOPT_TRANSPORT_PARAM</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1.2.4">
-                    <p id="section-toc.1-1.6.2.1.2.4.1"><a href="#section-6.1.4" class="auto internal xref">6.1.4</a>.  <a href="#name-quic_sockopt_token" class="internal xref">QUIC_SOCKOPT_TOKEN</a></p>
+                    <p id="section-toc.1-1.6.2.1.2.4.1"><a href="#section-6.1.4" class="auto internal xref">6.1.4</a>.  <a href="#name-quic_sockopt_config" class="internal xref">QUIC_SOCKOPT_CONFIG</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1.2.5">
-                    <p id="section-toc.1-1.6.2.1.2.5.1"><a href="#section-6.1.5" class="auto internal xref">6.1.5</a>.  <a href="#name-quic_sockopt_alpn" class="internal xref">QUIC_SOCKOPT_ALPN</a></p>
+                    <p id="section-toc.1-1.6.2.1.2.5.1"><a href="#section-6.1.5" class="auto internal xref">6.1.5</a>.  <a href="#name-quic_sockopt_token" class="internal xref">QUIC_SOCKOPT_TOKEN</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1.2.6">
-                    <p id="section-toc.1-1.6.2.1.2.6.1"><a href="#section-6.1.6" class="auto internal xref">6.1.6</a>.  <a href="#name-quic_sockopt_session_ticket" class="internal xref">QUIC_SOCKOPT_SESSION_TICKET</a></p>
+                    <p id="section-toc.1-1.6.2.1.2.6.1"><a href="#section-6.1.6" class="auto internal xref">6.1.6</a>.  <a href="#name-quic_sockopt_alpn" class="internal xref">QUIC_SOCKOPT_ALPN</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1.2.7">
-                    <p id="section-toc.1-1.6.2.1.2.7.1"><a href="#section-6.1.7" class="auto internal xref">6.1.7</a>.  <a href="#name-quic_sockopt_crypto_secret" class="internal xref">QUIC_SOCKOPT_CRYPTO_SECRET</a></p>
+                    <p id="section-toc.1-1.6.2.1.2.7.1"><a href="#section-6.1.7" class="auto internal xref">6.1.7</a>.  <a href="#name-quic_sockopt_session_ticket" class="internal xref">QUIC_SOCKOPT_SESSION_TICKET</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1.2.8">
-                    <p id="section-toc.1-1.6.2.1.2.8.1"><a href="#section-6.1.8" class="auto internal xref">6.1.8</a>.  <a href="#name-quic_sockopt_transport_param" class="internal xref">QUIC_SOCKOPT_TRANSPORT_PARAM_EXT</a></p>
+                    <p id="section-toc.1-1.6.2.1.2.8.1"><a href="#section-6.1.8" class="auto internal xref">6.1.8</a>.  <a href="#name-quic_sockopt_crypto_secret" class="internal xref">QUIC_SOCKOPT_CRYPTO_SECRET</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1.2.9">
+                    <p id="section-toc.1-1.6.2.1.2.9.1"><a href="#section-6.1.9" class="auto internal xref">6.1.9</a>.  <a href="#name-quic_sockopt_transport_param" class="internal xref">QUIC_SOCKOPT_TRANSPORT_PARAM_EXT</a></p>
 </li>
                 </ul>
 </li>
@@ -1520,13 +1532,16 @@ both userspace applications and kernel consumers.<a href="#section-abstract-1" c
             <p id="section-toc.1-1.11.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-example-for-multi-streaming" class="internal xref">Example For Multi-streaming Usage</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
-            <p id="section-toc.1-1.12.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-example-for-session-consump" class="internal xref">Example For Session Consumption and 0-RTT transmission</a></p>
+            <p id="section-toc.1-1.12.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-example-for-defining-custom" class="internal xref">Example For defining custom client/server_handshake()</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
-            <p id="section-toc.1-1.13.1"><a href="#appendix-C" class="auto internal xref">Appendix C</a>.  <a href="#name-example-for-kernel-consumer" class="internal xref">Example For Kernel Consumers Architecture Design</a></p>
+            <p id="section-toc.1-1.13.1"><a href="#appendix-C" class="auto internal xref">Appendix C</a>.  <a href="#name-example-for-session-consump" class="internal xref">Example For Session Consumption and 0-RTT transmission</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
-            <p id="section-toc.1-1.14.1"><a href="#appendix-D" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+            <p id="section-toc.1-1.14.1"><a href="#appendix-D" class="auto internal xref">Appendix D</a>.  <a href="#name-example-for-kernel-consumer" class="internal xref">Example For Kernel Consumers Architecture Design</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
+            <p id="section-toc.1-1.15.1"><a href="#appendix-E" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
 </li>
         </ul>
 </nav>
@@ -1706,7 +1721,7 @@ Client Initial packet and direct the incoming request based on it to
 different listening sockets (binding to the same address and port).
 These sockets could belong to different user processes or kernel
 threads. The ALPNs for sockets are set via socket option ALPN
-<a href="#sockopt_alpn" class="auto internal xref">Section 6.1.5</a> before calling listen().<a href="#section-3.1.3-7" class="pilcrow">¶</a></p>
+<a href="#sockopt_alpn" class="auto internal xref">Section 6.1.6</a> before calling listen().<a href="#section-3.1.3-7" class="pilcrow">¶</a></p>
 </section>
 <section id="section-3.1.4">
           <h4 id="name-accept">
@@ -2013,19 +2028,14 @@ supplied sockaddr structure, the stored address will be truncated.<a href="#sect
 <p id="section-3.2.1-1">An application uses quic_sendmsg() and quic_recvmsg() calls to
 transmit data to and receive data from its peer with stream_id and
 flags.<a href="#section-3.2.1-1" class="pilcrow">¶</a></p>
-<p id="section-3.2.1-2">The function prototypes are<a href="#section-3.2.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.2.1-2">The function prototype of quic_sendmsg() is<a href="#section-3.2.1-2" class="pilcrow">¶</a></p>
 <div class="C lang-language sourcecode" id="section-3.2.1-3">
 <pre>
 ssize_t quic_sendmsg(int sd,
                      const void *msg,
                      size_t len,
-                     uint64_t sid,
+                     int64_t sid,
                      uint32_t flags);
-ssize_t quic_recvmsg(int sd,
-                     void *msg,
-                     size_t len,
-                     uint64_t *sid,
-                     uint32_t *flags);
 </pre><a href="#section-3.2.1-3" class="pilcrow">¶</a>
 </div>
 <p id="section-3.2.1-4">and the arguments are<a href="#section-3.2.1-4" class="pilcrow">¶</a></p>
@@ -2036,80 +2046,147 @@ ssize_t quic_recvmsg(int sd,
 </li>
             <li class="normal" id="section-3.2.1-5.3">len:  The length of the message buffer.<a href="#section-3.2.1-5.3" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-3.2.1-5.4">sid:  stream_id to point for sending or to get for receiving.<a href="#section-3.2.1-5.4" class="pilcrow">¶</a>
+            <li class="normal" id="section-3.2.1-5.4">sid:  stream_id to point for sending.<a href="#section-3.2.1-5.4" class="pilcrow">¶</a>
 </li>
             <li class="normal" id="section-3.2.1-5.5">flags:  function as stream_flags in <a href="#struct_stream" class="auto internal xref">Section 4.3.1</a> and
 msg_flags/flags in <a href="#struct_msghdr" class="auto internal xref">Section 4.1</a>.<a href="#section-3.2.1-5.5" class="pilcrow">¶</a>
 </li>
           </ul>
 <p id="section-3.2.1-6">quic_sendmsg() returns the number of bytes accepted by kernel or -1
-in case of an error.  quic_recvmsg() returns the number of bytes received
-or -1 in case of an error.<a href="#section-3.2.1-6" class="pilcrow">¶</a></p>
-<p id="section-3.2.1-7">These functions wrap the sendmsg() and recvmsg() with Stream information
-msg_control, and are important for using QUIC multiple streams. See an
-example in <a href="#example_stream" class="auto internal xref">Appendix A</a><a href="#section-3.2.1-7" class="pilcrow">¶</a></p>
+in case of an error.<a href="#section-3.2.1-6" class="pilcrow">¶</a></p>
+<p id="section-3.2.1-7">The function prototype of quic_recvmsg() is<a href="#section-3.2.1-7" class="pilcrow">¶</a></p>
+<div class="C lang-language sourcecode" id="section-3.2.1-8">
+<pre>
+ssize_t quic_recvmsg(int sd,
+                     void *msg,
+                     size_t len,
+                     int64_t *sid,
+                     uint32_t *flags);
+</pre><a href="#section-3.2.1-8" class="pilcrow">¶</a>
+</div>
+<p id="section-3.2.1-9">and the arguments are<a href="#section-3.2.1-9" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.2.1-10.1">sd:  The socket descriptor.<a href="#section-3.2.1-10.1" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-3.2.1-10.2">msg:  The message buffer to be filled.<a href="#section-3.2.1-10.2" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-3.2.1-10.3">len:  The length of the message buffer.<a href="#section-3.2.1-10.3" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-3.2.1-10.4">sid:  stream_id to point for receiving.<a href="#section-3.2.1-10.4" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-3.2.1-10.5">flags:  function as stream_flags in <a href="#struct_stream" class="auto internal xref">Section 4.3.1</a> and
+msg_flags/flags in <a href="#struct_msghdr" class="auto internal xref">Section 4.1</a>.<a href="#section-3.2.1-10.5" class="pilcrow">¶</a>
+</li>
+          </ul>
+<p id="section-3.2.1-11">quic_recvmsg() returns the number of bytes received or -1 in case of
+an error.<a href="#section-3.2.1-11" class="pilcrow">¶</a></p>
+<p id="section-3.2.1-12">These two functions wrap the sendmsg() and recvmsg() with Stream
+information msg_control, and are important for using QUIC multiple
+streams. See an example in <a href="#example_stream" class="auto internal xref">Appendix A</a><a href="#section-3.2.1-12" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="advanced_handshake">
 <section id="section-3.2.2">
-          <h4 id="name-quic_client_handshake-and-q">
-<a href="#section-3.2.2" class="section-number selfRef">3.2.2. </a><a href="#name-quic_client_handshake-and-q" class="section-name selfRef">quic_client_handshake() and quic_server_handshake()</a>
+          <h4 id="name-quic_client-server_handshak">
+<a href="#section-3.2.2" class="section-number selfRef">3.2.2. </a><a href="#name-quic_client-server_handshak" class="section-name selfRef">quic_client/server_handshake()</a>
           </h4>
 <p id="section-3.2.2-1">An application uses quic_client_handshake() or quic_server_handshake()
 to initiate a QUIC handshake, either with Certificate or PSK mode, from
 the client or server side..<a href="#section-3.2.2-1" class="pilcrow">¶</a></p>
-<p id="section-3.2.2-2">The function prototypes are<a href="#section-3.2.2-2" class="pilcrow">¶</a></p>
+<p id="section-3.2.2-2">The function prototype of quic_server_handshake() is:<a href="#section-3.2.2-2" class="pilcrow">¶</a></p>
 <div class="C lang-language sourcecode" id="section-3.2.2-3">
 <pre>
-int quic_server_handshake(int sd, ...);
-int quic_client_handshake(int sd, ...);
+int quic_server_handshake(int sd,
+                          const char *pkey_file,
+                          const char *cert_file,
+                          const char *alpns);
 </pre><a href="#section-3.2.2-3" class="pilcrow">¶</a>
 </div>
 <p id="section-3.2.2-4">and the arguments are<a href="#section-3.2.2-4" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.2.2-5.1">sd:  The socket descriptor.<a href="#section-3.2.2-5.1" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-3.2.2-5.2">...:  Additional arguments, implementation-specific.<a href="#section-3.2.2-5.2" class="pilcrow">¶</a>
+            <li class="normal" id="section-3.2.2-5.2">pkey_file:  Private key file for Certificate mode or pre-shared
+key file for PSK mode.<a href="#section-3.2.2-5.2" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-3.2.2-5.3">cert_file:  Certificate file for Certificate mode or null for
+PSK mode.<a href="#section-3.2.2-5.3" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-3.2.2-5.4">alpns: ALPNs supported and split by ','.<a href="#section-3.2.2-5.4" class="pilcrow">¶</a>
 </li>
           </ul>
-<p id="section-3.2.2-6">These functions return 0 for success and errcode in case of an
-error.<a href="#section-3.2.2-6" class="pilcrow">¶</a></p>
-<p id="section-3.2.2-7">Implementation guidelines for handling TLS and QUIC communications
-between kernel and userspace:<a href="#section-3.2.2-7" class="pilcrow">¶</a></p>
+<p id="section-3.2.2-6">The function prototype of quic_client_handshake() is:<a href="#section-3.2.2-6" class="pilcrow">¶</a></p>
+<div class="C lang-language sourcecode" id="section-3.2.2-7">
+<pre>
+int quic_client_handshake(int sd,
+                          const char *pkey_file,
+                          const char *hostname,
+                          const char *alpns);
+</pre><a href="#section-3.2.2-7" class="pilcrow">¶</a>
+</div>
+<p id="section-3.2.2-8">and the arguments are<a href="#section-3.2.2-8" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.2.2-8.1">
-              <p id="section-3.2.2-8.1.1">Handling Raw TLS Messages:<a href="#section-3.2.2-8.1.1" class="pilcrow">¶</a></p>
-<p id="section-3.2.2-8.1.2">The implementation of these functions SHOULD use sendmsg() and recvmsg()
-with Handshake msg_control <a href="#struct_handshake" class="auto internal xref">Section 4.3.2</a> to send and
-receive raw TLS messages to and from kernel, and exchange them in userspace
-via a TLS library like GnuTLS.<a href="#section-3.2.2-8.1.2" class="pilcrow">¶</a></p>
+<li class="normal" id="section-3.2.2-9.1">sd:  The socket descriptor.<a href="#section-3.2.2-9.1" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-3.2.2-8.2">
-              <p id="section-3.2.2-8.2.1">Retrieving and Setting Handshake Parameters:<a href="#section-3.2.2-8.2.1" class="pilcrow">¶</a></p>
-<p id="section-3.2.2-8.2.2">The implementation SHOULD use socket options to retrieve handshake
-parameters from kernel for building TLS messages, such as ALPN
-<a href="#sockopt_alpn" class="auto internal xref">Section 6.1.5</a>, TRANSPORT_PARAM
-TRANSPORT_PARAM <a href="#sockopt_transport_param" class="auto internal xref">Section 6.1.3</a>, and
-TRANSPORT_PARAM_EXT <a href="#sockopt_transport_param_ext" class="auto internal xref">Section 6.1.8</a>.
-They SHOULD set handshake parameters in kernel for constructing QUIC
-packets, including TRANSPORT_PARAM_EXT
-<a href="#sockopt_transport_param_ext" class="auto internal xref">Section 6.1.8</a> and CRYPTO_SECRET
-<a href="#sockopt_crypto_secret" class="auto internal xref">Section 6.1.7</a>.<a href="#section-3.2.2-8.2.2" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-3.2.2-9.2">psk_file: Pre-shared key file for PSK mode.<a href="#section-3.2.2-9.2" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-3.2.2-8.3">
-              <p id="section-3.2.2-8.3.1">Session Resumption and Early or 0-RTT Data:<a href="#section-3.2.2-8.3.1" class="pilcrow">¶</a></p>
-<p id="section-3.2.2-8.3.2">These functions MAY support session resumption by retrieving the session
-ticket from kernel using socket option SESSION_TICKET
-<a href="#sockopt_session_ticket" class="auto internal xref">Section 6.1.6</a>. They MAY use sendmsg() and
-recvmsg() with Stream msg_control <a href="#struct_stream" class="auto internal xref">Section 4.3.1</a> to handle
-early or 0-RTT data before the completion of the handshake for userspace
-applications.<a href="#section-3.2.2-8.3.2" class="pilcrow">¶</a></p>
-<p id="section-3.2.2-8.3.3">However, for kernel consumers, since user data is managed entirely
-within the kernel, early or 0-RTT data SHOULD be buffered using sendmsg()
-before invoking the handshake request to userspace. Additionally, TLS
-session ticket message MUST be handled before user data. Refer to
-receive_session_ticket parameter in socket option TRANSPORT_PARAM
-<a href="#sockopt_transport_param" class="auto internal xref">Section 6.1.3</a>.<a href="#section-3.2.2-8.3.3" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-3.2.2-9.3">hostname: Server name for Certificate mode.<a href="#section-3.2.2-9.3" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-3.2.2-9.4">alpns: ALPNs supported and split by ','.<a href="#section-3.2.2-9.4" class="pilcrow">¶</a>
+</li>
+          </ul>
+<p id="section-3.2.2-10">These functions return 0 for success and errcode in case of an
+error.<a href="#section-3.2.2-10" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="advanced_do_handshake">
+<section id="section-3.2.3">
+          <h4 id="name-quic_handshake">
+<a href="#section-3.2.3" class="section-number selfRef">3.2.3. </a><a href="#name-quic_handshake" class="section-name selfRef">quic_handshake()</a>
+          </h4>
+<p id="section-3.2.3-1">Using quic_handshake() allows an application to have greater control
+over the configuration of the handshake session.<a href="#section-3.2.3-1" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-2">The function prototype is<a href="#section-3.2.3-2" class="pilcrow">¶</a></p>
+<div class="C lang-language sourcecode" id="section-3.2.3-3">
+<pre>
+int quic_handshake(void *session);
+</pre><a href="#section-3.2.3-3" class="pilcrow">¶</a>
+</div>
+<p id="section-3.2.3-4">and the arguments are<a href="#section-3.2.3-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.2.3-5.1">session: A TLS session, which is represented differently across
+various TLS libraries, such as gnutls_session_t in GnuTLS or SSL * in
+OpenSSL.<a href="#section-3.2.3-5.1" class="pilcrow">¶</a>
+</li>
+          </ul>
+<p id="section-3.2.3-6">With the session argument, users can configure additional parameters at
+TLS level and define custom client_handshake() and server_handshake()
+functions. An example is provided in
+<a href="#example_early_handshake" class="auto internal xref">Appendix B</a>.<a href="#section-3.2.3-6" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-7">In the future, quic_handshake() MAY be considered for integration into
+these TLS libraries to provide comprehensive support for QUIC stack.<a href="#section-3.2.3-7" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-8">Here are some guidelines for handling TLS and QUIC communications
+between kernel and userspace when implement quic_handshake():<a href="#section-3.2.3-8" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.2.3-9.1">
+              <p id="section-3.2.3-9.1.1">Handling Raw TLS Messages:<a href="#section-3.2.3-9.1.1" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-9.1.2">The implementation SHOULD utilize sendmsg() and recvmsg() with Handshake
+msg_control <a href="#struct_handshake" class="auto internal xref">Section 4.3.2</a> to send and receive raw TLS
+messages between kernel and userspace. These messages should be processed
+in userspace using a TLS library, such as GnuTLS.<a href="#section-3.2.3-9.1.2" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.2.3-9.2">
+              <p id="section-3.2.3-9.2.1">Processing TLS QUIC Transport Parameters Extension:<a href="#section-3.2.3-9.2.1" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-9.2.2">The implementation SHOULD retrieve local TLS QUIC transport parameters
+extension from the kernel using socket option
+TRANSPORT_PARAM_EXT <a href="#sockopt_transport_param_ext" class="auto internal xref">Section 6.1.9</a> for
+building TLS messages. Additionally, remote handshake parameters should
+be set in kernel using the same socket option for constructing QUIC packets.<a href="#section-3.2.3-9.2.2" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.2.3-9.3">
+              <p id="section-3.2.3-9.3.1">Setting Secrets for Different Crypto Levels:<a href="#section-3.2.3-9.3.1" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-9.3.2">The implementation SHOULD set secrets for various crypto levels using
+socket option CRYPTO_SECRET <a href="#sockopt_crypto_secret" class="auto internal xref">Section 6.1.8</a>.<a href="#section-3.2.3-9.3.2" class="pilcrow">¶</a></p>
 </li>
           </ul>
 </section>
@@ -2418,11 +2495,9 @@ struct quic_handshake_info {
 </div>
 <p id="section-4.3.2-3">crypto_level: Specifies the level of data:<a href="#section-4.3.2-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-4.3.2-4.1">QUIC_CRYPTO_APP: Resumption ticket data.<a href="#section-4.3.2-4.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4.3.2-4.1">QUIC_CRYPTO_INITIAL: Initial level data.<a href="#section-4.3.2-4.1" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-4.3.2-4.2">QUIC_CRYPTO_INITIAL: Initial level data.<a href="#section-4.3.2-4.2" class="pilcrow">¶</a>
-</li>
-            <li class="normal" id="section-4.3.2-4.3">QUIC_CRYPTO_HANDSHAKE: Handshake level data.<a href="#section-4.3.2-4.3" class="pilcrow">¶</a>
+            <li class="normal" id="section-4.3.2-4.2">QUIC_CRYPTO_HANDSHAKE: Handshake level data.<a href="#section-4.3.2-4.2" class="pilcrow">¶</a>
 </li>
           </ul>
 <p id="section-4.3.2-5">This cmsg is used only during the handshake process.<a href="#section-4.3.2-5" class="pilcrow">¶</a></p>
@@ -2450,6 +2525,7 @@ enum quic_event_type {
   QUIC_EVENT_CONNECTION_MIGRATION,
   QUIC_EVENT_KEY_UPDATE,
   QUIC_EVENT_NEW_TOKEN,
+  QUIC_EVENT_NEW_SESSION_TICKET,
 };
 </pre><a href="#section-5-2" class="pilcrow">¶</a>
 </div>
@@ -2605,12 +2681,27 @@ uint8_t key_update_phase;
           </h4>
 <p id="section-5.1.6-1">This notification is delivered whenever a NEW_TOKEN frame is received
 from the peer. Since the handshake occurs in userspace, you can send these
-tokens using socket option TOKEN <a href="#sockopt_new_token" class="auto internal xref">Section 6.1.4</a>.<a href="#section-5.1.6-1" class="pilcrow">¶</a></p>
+tokens using socket option TOKEN <a href="#sockopt_new_token" class="auto internal xref">Section 6.1.5</a>.<a href="#section-5.1.6-1" class="pilcrow">¶</a></p>
 <p id="section-5.1.6-2">Data format in the event<a href="#section-5.1.6-2" class="pilcrow">¶</a></p>
 <div class="C lang-language sourcecode" id="section-5.1.6-3">
 <pre>
 uint8_t *token;
 </pre><a href="#section-5.1.6-3" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="event_new_session_ticket">
+<section id="section-5.1.7">
+          <h4 id="name-quic_event_new_session_tick">
+<a href="#section-5.1.7" class="section-number selfRef">5.1.7. </a><a href="#name-quic_event_new_session_tick" class="section-name selfRef">QUIC_EVENT_NEW_SESSION_TICKET</a>
+          </h4>
+<p id="section-5.1.7-1">This notification is delivered whenever a NEW_SESSION_TICKET message
+carried in crypto frame is received from the peer.<a href="#section-5.1.7-1" class="pilcrow">¶</a></p>
+<p id="section-5.1.7-2">Data format in the event<a href="#section-5.1.7-2" class="pilcrow">¶</a></p>
+<div class="C lang-language sourcecode" id="section-5.1.7-3">
+<pre>
+uint8_t *ticket;
+</pre><a href="#section-5.1.7-3" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -2704,20 +2795,16 @@ struct quic_connection_close {
           </ul>
 </section>
 </div>
-<div id="sockopt_transport_param">
 <section id="section-6.1.3">
           <h4 id="name-quic_sockopt_transport_para">
 <a href="#section-6.1.3" class="section-number selfRef">6.1.3. </a><a href="#name-quic_sockopt_transport_para" class="section-name selfRef">QUIC_SOCKOPT_TRANSPORT_PARAM</a>
           </h4>
-<p id="section-6.1.3-1">This option is used to configure transport parameters, including both
-the original QUIC transport parameters and some handshake-specific
-options.<a href="#section-6.1.3-1" class="pilcrow">¶</a></p>
+<p id="section-6.1.3-1">This option is used to configure QUIC transport parameters.<a href="#section-6.1.3-1" class="pilcrow">¶</a></p>
 <p id="section-6.1.3-2">The optval type is<a href="#section-6.1.3-2" class="pilcrow">¶</a></p>
 <div class="C lang-language sourcecode" id="section-6.1.3-3">
 <pre>
 struct quic_transport_param {
   uint8_t     remote;
-
   uint8_t     disable_active_migration; // 0 by default
   uint8_t     grease_quic_bit; // 0
   uint8_t     stateless_reset; // 0
@@ -2735,256 +2822,262 @@ struct quic_transport_param {
   uint64_t    max_stream_data_uni; // 65536 * 4
   uint64_t    max_streams_bidi; // 100
   uint64_t    max_streams_uni; // 100
-  uint64_t    initial_smoothed_rtt; // 333000
-
-  uint32_t    plpmtud_probe_timeout; // 0 (in usec)
-  uint8_t     validate_peer_address; // 0
-  uint8_t     receive_session_ticket; // 0
-  uint8_t     certificate_request; // 0
-  uint8_t     congestion_control_alg; // QUIC_CONG_ALG_RENO
-  uint32_t    payload_cipher_type; // 0
-  uint32_t    version; // QUIC_VERSION_V1
 };
 </pre><a href="#section-6.1.3-3" class="pilcrow">¶</a>
 </div>
-<p id="section-6.1.3-4">Transport Parameters from <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>:<a href="#section-6.1.3-4" class="pilcrow">¶</a></p>
+<p id="section-6.1.3-4">These parameters and descripted in <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>
+and their default values are specified in the struct code.<a href="#section-6.1.3-4" class="pilcrow">¶</a></p>
+<p id="section-6.1.3-5">The remote member allows users to set remote transport parameters.
+When used in conjunction with session resumption ticket, it enables the
+configuration of remote transport parameters from the previous connection.
+This configuration is crucial for sending 0-RTT data efficiently.<a href="#section-6.1.3-5" class="pilcrow">¶</a></p>
+</section>
+<div id="sockopt_config">
+<section id="section-6.1.4">
+          <h4 id="name-quic_sockopt_config">
+<a href="#section-6.1.4" class="section-number selfRef">6.1.4. </a><a href="#name-quic_sockopt_config" class="section-name selfRef">QUIC_SOCKOPT_CONFIG</a>
+          </h4>
+<p id="section-6.1.4-1">This option is used to configure various settings for QUIC connection,
+and also includes some handshake-specific options for kernel consumers.<a href="#section-6.1.4-1" class="pilcrow">¶</a></p>
+<p id="section-6.1.4-2">The optval type is<a href="#section-6.1.4-2" class="pilcrow">¶</a></p>
+<div class="C lang-language sourcecode" id="section-6.1.4-3">
+<pre>
+struct quic_config {
+  uint32_t    version;
+  uint32_t    plpmtud_probe_timeout;
+  uint64_t    initial_smoothed_rtt;
+  uint8_t     congestion_control_algo;
+  uint8_t     validate_peer_address;
+  uint32_t    payload_cipher_type;
+  uint8_t     receive_session_ticket;
+  uint8_t     certificate_request;
+};
+</pre><a href="#section-6.1.4-3" class="pilcrow">¶</a>
+</div>
 <ul class="normal">
-<li class="normal" id="section-6.1.3-5.1">max_udp_payload_size<a href="#section-6.1.3-5.1" class="pilcrow">¶</a>
+<li class="normal" id="section-6.1.4-4.1">
+              <p id="section-6.1.4-4.1.1">version:<a href="#section-6.1.4-4.1.1" class="pilcrow">¶</a></p>
+<p id="section-6.1.4-4.1.2">QUIC version, options include:<a href="#section-6.1.4-4.1.2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.1.4-4.1.3.1">QUIC_VERSION_V1 (by default)<a href="#section-6.1.4-4.1.3.1" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-6.1.3-5.2">ack_delay_exponent<a href="#section-6.1.3-5.2" class="pilcrow">¶</a>
+                <li class="normal" id="section-6.1.4-4.1.3.2">QUIC_VERSION_V2<a href="#section-6.1.4-4.1.3.2" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-6.1.3-5.3">max_ack_delay<a href="#section-6.1.3-5.3" class="pilcrow">¶</a>
+              </ul>
 </li>
-            <li class="normal" id="section-6.1.3-5.4">active_connection_id_limit<a href="#section-6.1.3-5.4" class="pilcrow">¶</a>
+            <li class="normal" id="section-6.1.4-4.2">
+              <p id="section-6.1.4-4.2.1">plpmtud_probe_interval (in usec):<a href="#section-6.1.4-4.2.1" class="pilcrow">¶</a></p>
+<p id="section-6.1.4-4.2.2">The probe interval of Packetization Layer Path MTU Discovery.
+  options include:<a href="#section-6.1.4-4.2.2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.1.4-4.2.3.1">0: disabled (by default)<a href="#section-6.1.4-4.2.3.1" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-6.1.3-5.5">max_idle_timeout<a href="#section-6.1.3-5.5" class="pilcrow">¶</a>
+                <li class="normal" id="section-6.1.4-4.2.3.2">!0: at least QUIC_MIN_PROBE_TIMEOUT (5000000)<a href="#section-6.1.4-4.2.3.2" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-6.1.3-5.6">max_datagram_frame_size<a href="#section-6.1.3-5.6" class="pilcrow">¶</a>
+              </ul>
 </li>
-            <li class="normal" id="section-6.1.3-5.7">max_data<a href="#section-6.1.3-5.7" class="pilcrow">¶</a>
+            <li class="normal" id="section-6.1.4-4.3">
+              <p id="section-6.1.4-4.3.1">initial_smoothed_rtt (in usec):<a href="#section-6.1.4-4.3.1" class="pilcrow">¶</a></p>
+<p id="section-6.1.4-4.3.2">The initial smoothed rtt, options include:<a href="#section-6.1.4-4.3.2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.1.4-4.3.3.1">333000 (by default)<a href="#section-6.1.4-4.3.3.1" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-6.1.3-5.8">max_stream_data_bidi_local<a href="#section-6.1.3-5.8" class="pilcrow">¶</a>
+                <li class="normal" id="section-6.1.4-4.3.3.2">at least QUIC_RTO_MIN (100000)<a href="#section-6.1.4-4.3.3.2" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-6.1.3-5.9">max_stream_data_bidi_remote<a href="#section-6.1.3-5.9" class="pilcrow">¶</a>
+                <li class="normal" id="section-6.1.4-4.3.3.3">less than QUIC_RTO_MAX (6000000)<a href="#section-6.1.4-4.3.3.3" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-6.1.3-5.10">max_stream_data_uni<a href="#section-6.1.3-5.10" class="pilcrow">¶</a>
+              </ul>
 </li>
-            <li class="normal" id="section-6.1.3-5.11">max_streams_bidi<a href="#section-6.1.3-5.11" class="pilcrow">¶</a>
+            <li class="normal" id="section-6.1.4-4.4">
+              <p id="section-6.1.4-4.4.1">congestion_control_algo:<a href="#section-6.1.4-4.4.1" class="pilcrow">¶</a></p>
+<p id="section-6.1.4-4.4.2">Congestion control algorithm, options MAY include:<a href="#section-6.1.4-4.4.2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.1.4-4.4.3.1">NEW_RENO (by default)<a href="#section-6.1.4-4.4.3.1" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-6.1.3-5.12">max_streams_uni<a href="#section-6.1.3-5.12" class="pilcrow">¶</a>
+                <li class="normal" id="section-6.1.4-4.4.3.2">CUBIC<a href="#section-6.1.4-4.4.3.2" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-6.1.3-5.13">initial_smoothed_rtt<a href="#section-6.1.3-5.13" class="pilcrow">¶</a>
+                <li class="normal" id="section-6.1.4-4.4.3.3">BBR<a href="#section-6.1.4-4.4.3.3" class="pilcrow">¶</a>
+</li>
+              </ul>
+</li>
+            <li class="normal" id="section-6.1.4-4.5">
+              <p id="section-6.1.4-4.5.1">validate_peer_address:<a href="#section-6.1.4-4.5.1" class="pilcrow">¶</a></p>
+<p id="section-6.1.4-4.5.2">This option is Server-side only, and if it is enabled, server will
+  send a retry packet to client upon receiving the first handshake request.
+  This serves to validate client's IP address, ensuring it is legitimate
+  and reachable before proceeding with the rest of the handshake.<a href="#section-6.1.4-4.5.2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.1.4-4.5.3.1">0: disabled (by default)<a href="#section-6.1.4-4.5.3.1" class="pilcrow">¶</a>
+</li>
+                <li class="normal" id="section-6.1.4-4.5.3.2">!0: enabled<a href="#section-6.1.4-4.5.3.2" class="pilcrow">¶</a>
+</li>
+              </ul>
+</li>
+            <li class="normal" id="section-6.1.4-4.6">
+              <p id="section-6.1.4-4.6.1">payload_cipher_type:<a href="#section-6.1.4-4.6.1" class="pilcrow">¶</a></p>
+<p id="section-6.1.4-4.6.2"> This option is for kernel consumers only, allowing them to inform
+  userspace handshake of the preferred cipher type, options include:<a href="#section-6.1.4-4.6.2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.1.4-4.6.3.1">0: any type (by default)<a href="#section-6.1.4-4.6.3.1" class="pilcrow">¶</a>
+</li>
+                <li class="normal" id="section-6.1.4-4.6.3.2">AES_GCM_128<a href="#section-6.1.4-4.6.3.2" class="pilcrow">¶</a>
+</li>
+                <li class="normal" id="section-6.1.4-4.6.3.3">AES_GCM_256<a href="#section-6.1.4-4.6.3.3" class="pilcrow">¶</a>
+</li>
+                <li class="normal" id="section-6.1.4-4.6.3.4">AES_CCM_128<a href="#section-6.1.4-4.6.3.4" class="pilcrow">¶</a>
+</li>
+                <li class="normal" id="section-6.1.4-4.6.3.5">CHACHA20_POLY1305<a href="#section-6.1.4-4.6.3.5" class="pilcrow">¶</a>
+</li>
+              </ul>
+</li>
+            <li class="normal" id="section-6.1.4-4.7">
+              <p id="section-6.1.4-4.7.1">receive_session_ticket (in sec):<a href="#section-6.1.4-4.7.1" class="pilcrow">¶</a></p>
+<p id="section-6.1.4-4.7.2">This option is for Client-side kernel consumers only, enabling
+  userspace handshake to receive session ticket, either via event
+  NEW_SESSION_TICKET <a href="#event_new_session_ticket" class="auto internal xref">Section 5.1.7</a> or socket
+  option SESSION_TICKET <a href="#sockopt_session_ticket" class="auto internal xref">Section 6.1.7</a> and then
+  set back to kernel via socket option SESSION_TICKET.<a href="#section-6.1.4-4.7.2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.1.4-4.7.3.1">0: disabled (by default)<a href="#section-6.1.4-4.7.3.1" class="pilcrow">¶</a>
+</li>
+                <li class="normal" id="section-6.1.4-4.7.3.2">!0: maximum time (in sec) to wait<a href="#section-6.1.4-4.7.3.2" class="pilcrow">¶</a>
+</li>
+              </ul>
+</li>
+            <li class="normal" id="section-6.1.4-4.8">
+              <p id="section-6.1.4-4.8.1">certificate_request:<a href="#section-6.1.4-4.8.1" class="pilcrow">¶</a></p>
+<p id="section-6.1.4-4.8.2">This option is Server-side kernel consumers only, instructing
+  userspace handshake whether to request a certificate from client,
+  options include:<a href="#section-6.1.4-4.8.2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.1.4-4.8.3.1">0: IGNORE (by default)<a href="#section-6.1.4-4.8.3.1" class="pilcrow">¶</a>
+</li>
+                <li class="normal" id="section-6.1.4-4.8.3.2">1: REQUEST<a href="#section-6.1.4-4.8.3.2" class="pilcrow">¶</a>
+</li>
+                <li class="normal" id="section-6.1.4-4.8.3.3">2: REQUIRE<a href="#section-6.1.4-4.8.3.3" class="pilcrow">¶</a>
+</li>
+              </ul>
 </li>
           </ul>
-<p id="section-6.1.3-6">Handshake Options:<a href="#section-6.1.3-6" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-6.1.3-7.1">
-              <p id="section-6.1.3-7.1.1">plpmtud_probe_timeout (in usec):<a href="#section-6.1.3-7.1.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-6.1.3-7.1.2.1">0 to disable<a href="#section-6.1.3-7.1.2.1" class="pilcrow">¶</a>
-</li>
-                <li class="normal" id="section-6.1.3-7.1.2.2">at least QUIC_MIN_PROBE_TIMEOUT (5000000)<a href="#section-6.1.3-7.1.2.2" class="pilcrow">¶</a>
-</li>
-              </ul>
-</li>
-            <li class="normal" id="section-6.1.3-7.2">
-              <p id="section-6.1.3-7.2.1">validate_peer_address: Server-side only:<a href="#section-6.1.3-7.2.1" class="pilcrow">¶</a></p>
-<p id="section-6.1.3-7.2.2">If this option is enabled, server will send a retry packet to client
-upon receiving the first handshake request. This serves to validate
-client's IP address, ensuring it is legitimate and reachable before
-proceeding with the rest of the handshake.<a href="#section-6.1.3-7.2.2" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-6.1.3-7.3">
-              <p id="section-6.1.3-7.3.1">receive_session_ticket: Client-side only:<a href="#section-6.1.3-7.3.1" class="pilcrow">¶</a></p>
-<p id="section-6.1.3-7.3.2">If this option is enabled, client will not deliver user data to
-userspace until TLS session ticket message is received. This ensures
-userspace handshake to complete with TLS session ticket message processed
-and resumption ticket set back to kernel before kernel consumers receives
-any user data. If this option is not set, TLS session ticket message will
-be dropped.<a href="#section-6.1.3-7.3.2" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-6.1.3-7.4">
-              <p id="section-6.1.3-7.4.1">certificate_request: Server-side only, options include:<a href="#section-6.1.3-7.4.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-6.1.3-7.4.2.1">0: IGNORE<a href="#section-6.1.3-7.4.2.1" class="pilcrow">¶</a>
-</li>
-                <li class="normal" id="section-6.1.3-7.4.2.2">1: REQUEST<a href="#section-6.1.3-7.4.2.2" class="pilcrow">¶</a>
-</li>
-                <li class="normal" id="section-6.1.3-7.4.2.3">2: REQUIRE<a href="#section-6.1.3-7.4.2.3" class="pilcrow">¶</a>
-</li>
-              </ul>
-</li>
-            <li class="normal" id="section-6.1.3-7.5">
-              <p id="section-6.1.3-7.5.1">congestion_control_alg: Congestion control algorithm,
-options MAY include:<a href="#section-6.1.3-7.5.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-6.1.3-7.5.2.1">NEW_RENO<a href="#section-6.1.3-7.5.2.1" class="pilcrow">¶</a>
-</li>
-                <li class="normal" id="section-6.1.3-7.5.2.2">CUBIC<a href="#section-6.1.3-7.5.2.2" class="pilcrow">¶</a>
-</li>
-                <li class="normal" id="section-6.1.3-7.5.2.3">BBR<a href="#section-6.1.3-7.5.2.3" class="pilcrow">¶</a>
-</li>
-              </ul>
-</li>
-            <li class="normal" id="section-6.1.3-7.6">
-              <p id="section-6.1.3-7.6.1">payload_cipher_type: Cipher type for payload encryption,
-options include:<a href="#section-6.1.3-7.6.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-6.1.3-7.6.2.1">AES_GCM_128<a href="#section-6.1.3-7.6.2.1" class="pilcrow">¶</a>
-</li>
-                <li class="normal" id="section-6.1.3-7.6.2.2">AES_GCM_256<a href="#section-6.1.3-7.6.2.2" class="pilcrow">¶</a>
-</li>
-                <li class="normal" id="section-6.1.3-7.6.2.3">AES_CCM_128<a href="#section-6.1.3-7.6.2.3" class="pilcrow">¶</a>
-</li>
-                <li class="normal" id="section-6.1.3-7.6.2.4">CHACHA20_POLY1305<a href="#section-6.1.3-7.6.2.4" class="pilcrow">¶</a>
-</li>
-              </ul>
-</li>
-            <li class="normal" id="section-6.1.3-7.7">
-              <p id="section-6.1.3-7.7.1">version: QUIC version, options include:<a href="#section-6.1.3-7.7.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-6.1.3-7.7.2.1">QUIC_VERSION_V1<a href="#section-6.1.3-7.7.2.1" class="pilcrow">¶</a>
-</li>
-                <li class="normal" id="section-6.1.3-7.7.2.2">QUIC_VERSION_V2<a href="#section-6.1.3-7.7.2.2" class="pilcrow">¶</a>
-</li>
-              </ul>
-</li>
-          </ul>
-<p id="section-6.1.3-8">Others:<a href="#section-6.1.3-8" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-6.1.3-9.1">remote: Allows users to set remote transport parameters. Together with
-the session resumption ticket, it is used to set the remote transport
-parameters from the last connection before sending 0-RTT data.<a href="#section-6.1.3-9.1" class="pilcrow">¶</a>
-</li>
-          </ul>
-<p id="section-6.1.3-10">All members have default values as specified in the struct code.<a href="#section-6.1.3-10" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sockopt_new_token">
-<section id="section-6.1.4">
-          <h4 id="name-quic_sockopt_token">
-<a href="#section-6.1.4" class="section-number selfRef">6.1.4. </a><a href="#name-quic_sockopt_token" class="section-name selfRef">QUIC_SOCKOPT_TOKEN</a>
-          </h4>
-<p id="section-6.1.4-1">This option is used to manage tokens for address verification in QUIC
-connections. It behaves differently depending on whether it's being used
-on the client side or the server side.<a href="#section-6.1.4-1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-6.1.4-2.1">
-              <p id="section-6.1.4-2.1.1">Client-Side Usage:<a href="#section-6.1.4-2.1.1" class="pilcrow">¶</a></p>
-<p id="section-6.1.4-2.1.2">The client uses this option to set a token provided by the peer
-  server. This token is typically issued by the server during the last
-  connection and is used for address verification in subsequent
-  connections.<a href="#section-6.1.4-2.1.2" class="pilcrow">¶</a></p>
-<p id="section-6.1.4-2.1.3">The token can be obtained from the server during the previous
-  connection, either via getsockopt() with this option or from event
-  NEW_TOKEN <a href="#event_new_token" class="auto internal xref">Section 5.1.6</a>.<a href="#section-6.1.4-2.1.3" class="pilcrow">¶</a></p>
-<p id="section-6.1.4-2.1.4">The optval type is<a href="#section-6.1.4-2.1.4" class="pilcrow">¶</a></p>
-<div class="C lang-language sourcecode" id="section-6.1.4-2.1.5">
-<pre>
-  uint8_t *opt;
-</pre><a href="#section-6.1.4-2.1.5" class="pilcrow">¶</a>
-</div>
-</li>
-            <li class="normal" id="section-6.1.4-2.2">
-              <p id="section-6.1.4-2.2.1">Server-Side Usage:<a href="#section-6.1.4-2.2.1" class="pilcrow">¶</a></p>
-<p id="section-6.1.4-2.2.2">The server uses this option to issue a new token to the client. This
-  token will be used by the client for address verification in the next
-  connection.<a href="#section-6.1.4-2.2.2" class="pilcrow">¶</a></p>
-<p id="section-6.1.4-2.2.3">The optval type is null.<a href="#section-6.1.4-2.2.3" class="pilcrow">¶</a></p>
-</li>
-          </ul>
-<p id="section-6.1.4-3">The default value in socket is null.<a href="#section-6.1.4-3" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="sockopt_alpn">
 <section id="section-6.1.5">
-          <h4 id="name-quic_sockopt_alpn">
-<a href="#section-6.1.5" class="section-number selfRef">6.1.5. </a><a href="#name-quic_sockopt_alpn" class="section-name selfRef">QUIC_SOCKOPT_ALPN</a>
+          <h4 id="name-quic_sockopt_token">
+<a href="#section-6.1.5" class="section-number selfRef">6.1.5. </a><a href="#name-quic_sockopt_token" class="section-name selfRef">QUIC_SOCKOPT_TOKEN</a>
           </h4>
-<p id="section-6.1.5-1">This socket option is used to set or retrieve the ALPN identifiers
-before or after a QUIC handshake. ALPN is critical for selecting the
-protocol used over a QUIC connection, such as HTTP/3, SMB, or custom
-protocols.<a href="#section-6.1.5-1" class="pilcrow">¶</a></p>
+<p id="section-6.1.5-1">This option is used to manage tokens for address verification in QUIC
+connections. It behaves differently depending on whether it's being used
+on the client side or the server side.<a href="#section-6.1.5-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.1.5-2.1">
               <p id="section-6.1.5-2.1.1">Client-Side Usage:<a href="#section-6.1.5-2.1.1" class="pilcrow">¶</a></p>
-<p id="section-6.1.5-2.1.2">The client sets the desired ALPNs before the handshake. Multiple ALPNs
-  can be specified, separated by commas (e.g., "smbd,h3,ksmbd").<a href="#section-6.1.5-2.1.2" class="pilcrow">¶</a></p>
+<p id="section-6.1.5-2.1.2">The client uses this option to set a token provided by the peer
+  server. This token is typically issued by the server during the last
+  connection and is used for address verification in subsequent
+  connections.<a href="#section-6.1.5-2.1.2" class="pilcrow">¶</a></p>
+<p id="section-6.1.5-2.1.3">The token can be obtained from the server during the previous
+  connection, either via getsockopt() with this option or from event
+  NEW_TOKEN <a href="#event_new_token" class="auto internal xref">Section 5.1.6</a>.<a href="#section-6.1.5-2.1.3" class="pilcrow">¶</a></p>
+<p id="section-6.1.5-2.1.4">The optval type is<a href="#section-6.1.5-2.1.4" class="pilcrow">¶</a></p>
+<div class="C lang-language sourcecode" id="section-6.1.5-2.1.5">
+<pre>
+  uint8_t *opt;
+</pre><a href="#section-6.1.5-2.1.5" class="pilcrow">¶</a>
+</div>
 </li>
             <li class="normal" id="section-6.1.5-2.2">
               <p id="section-6.1.5-2.2.1">Server-Side Usage:<a href="#section-6.1.5-2.2.1" class="pilcrow">¶</a></p>
-<p id="section-6.1.5-2.2.2">On a listening socket if kernel supports ALPN matching, this feature
-  directs incoming requests to the appropriate application based on ALPNs.
-  The ALPNs MUST be set on the socket before calling listen() to enable
-  this functionality.<a href="#section-6.1.5-2.2.2" class="pilcrow">¶</a></p>
-<p id="section-6.1.5-2.2.3">On a accepting socket, the server sets the ALPNs it supports before
-  the handshake begins, otherwise, it uses the ALPNs from the listening
-  socket.<a href="#section-6.1.5-2.2.3" class="pilcrow">¶</a></p>
+<p id="section-6.1.5-2.2.2">The server uses this option to issue a new token to the client. This
+  token will be used by the client for address verification in the next
+  connection.<a href="#section-6.1.5-2.2.2" class="pilcrow">¶</a></p>
+<p id="section-6.1.5-2.2.3">The optval type is null.<a href="#section-6.1.5-2.2.3" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-6.1.5-3">During the handshake process, both client and server retrieve the ALPNs
-sent by the peer and attempt to match them with one of the ALPNs set on
-the socket prior to the handshake.<a href="#section-6.1.5-3" class="pilcrow">¶</a></p>
-<p id="section-6.1.5-4">Once a match is found, the matched ALPN is set on the socket after the
-handshake is completed. This allows users to retrieve the selected ALPN via
-the appropriate socket option, enabling the application to identify which
-protocol has been successfully negotiated.<a href="#section-6.1.5-4" class="pilcrow">¶</a></p>
-<p id="section-6.1.5-5">The optval type is<a href="#section-6.1.5-5" class="pilcrow">¶</a></p>
-<div class="C lang-language sourcecode" id="section-6.1.5-6">
+<p id="section-6.1.5-3">The default value in socket is null.<a href="#section-6.1.5-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="sockopt_alpn">
+<section id="section-6.1.6">
+          <h4 id="name-quic_sockopt_alpn">
+<a href="#section-6.1.6" class="section-number selfRef">6.1.6. </a><a href="#name-quic_sockopt_alpn" class="section-name selfRef">QUIC_SOCKOPT_ALPN</a>
+          </h4>
+<p id="section-6.1.6-1">This option is used on listening sockets for kernel ALPN routing.
+On regular sockets, it allows kernel consumers to communicate ALPN
+identifiers with userspace handshake.<a href="#section-6.1.6-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.1.6-2.1">
+              <p id="section-6.1.6-2.1.1">On regular sockets:<a href="#section-6.1.6-2.1.1" class="pilcrow">¶</a></p>
+<p id="section-6.1.6-2.1.2">It sets the desired ALPNs before kernel consumers send handshake
+  requests to userspace. Multiple ALPNs can be specified, separated by
+  commas (e.g., "smbd,h3,ksmbd"). Userspace handshake SHOULD return the
+  selected ALPN to kernel via this socket option.<a href="#section-6.1.6-2.1.2" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.1.6-2.2">
+              <p id="section-6.1.6-2.2.1">On listening socket:<a href="#section-6.1.6-2.2.1" class="pilcrow">¶</a></p>
+<p id="section-6.1.6-2.2.2">If kernel supports ALPN routing, this feature directs incoming
+  requests to the appropriate application based on ALPNs. The ALPNs
+  MUST be set on the socket before calling listen() to enable this
+  functionality.<a href="#section-6.1.6-2.2.2" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-6.1.6-3">The optval type is<a href="#section-6.1.6-3" class="pilcrow">¶</a></p>
+<div class="C lang-language sourcecode" id="section-6.1.6-4">
 <pre>
 char *alpn;
-</pre><a href="#section-6.1.5-6" class="pilcrow">¶</a>
+</pre><a href="#section-6.1.6-4" class="pilcrow">¶</a>
 </div>
-<p id="section-6.1.5-7">The default value in socket is null.<a href="#section-6.1.5-7" class="pilcrow">¶</a></p>
+<p id="section-6.1.6-5">The default value in socket is null.<a href="#section-6.1.6-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sockopt_session_ticket">
-<section id="section-6.1.6">
+<section id="section-6.1.7">
           <h4 id="name-quic_sockopt_session_ticket">
-<a href="#section-6.1.6" class="section-number selfRef">6.1.6. </a><a href="#name-quic_sockopt_session_ticket" class="section-name selfRef">QUIC_SOCKOPT_SESSION_TICKET</a>
+<a href="#section-6.1.7" class="section-number selfRef">6.1.7. </a><a href="#name-quic_sockopt_session_ticket" class="section-name selfRef">QUIC_SOCKOPT_SESSION_TICKET</a>
           </h4>
-<p id="section-6.1.6-1">This socket option is used to set a session resumption ticket on the
-client side, enabling the client to resume a previously established QUIC
-session with the server.<a href="#section-6.1.6-1" class="pilcrow">¶</a></p>
+<p id="section-6.1.7-1">This option is used on listening sockets to retrieve the key for
+enabling the session tickets on server. On regular sockets, it can be
+used to receive the session ticket message on client. It is also used
+by client-side kernel consumers to communicate session data with
+userspace handshake.<a href="#section-6.1.7-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.1.6-2.1">
-              <p id="section-6.1.6-2.1.1">Client-Side Usage:<a href="#section-6.1.6-2.1.1" class="pilcrow">¶</a></p>
-<p id="section-6.1.6-2.1.2">The client uses this option to set a session resumption ticket before
-  initiating a new connection. The ticket, usually issued by the peer
-  during the last connection, facilitates session resumption and helps
-  to re-establish the connection more efficiently.<a href="#section-6.1.6-2.1.2" class="pilcrow">¶</a></p>
-<p id="section-6.1.6-2.1.3">The ticket value is obtained from the previous connection, typically
-  via the getsockopt call with this option.<a href="#section-6.1.6-2.1.3" class="pilcrow">¶</a></p>
-<p id="section-6.1.6-2.1.4">The optval type is<a href="#section-6.1.6-2.1.4" class="pilcrow">¶</a></p>
-<div class="C lang-language sourcecode" id="section-6.1.6-2.1.5">
-<pre>
-  uint8_t *opt;
-</pre><a href="#section-6.1.6-2.1.5" class="pilcrow">¶</a>
-</div>
-<p id="section-6.1.6-2.1.6">See an example in <a href="#example_early" class="auto internal xref">Appendix B</a><a href="#section-6.1.6-2.1.6" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6.1.7-2.1">
+              <p id="section-6.1.7-2.1.1">For userspace handshake:<a href="#section-6.1.7-2.1.1" class="pilcrow">¶</a></p>
+<p id="section-6.1.7-2.1.2">On server side, userspace handshake requires a key to enable
+  session ticket, this key SHOULD be retrieved via this socket option.<a href="#section-6.1.7-2.1.2" class="pilcrow">¶</a></p>
+<p id="section-6.1.7-2.1.3">On client side, userspace handshake can receive NEW_SESSION_TICKET
+  messages via this socket option from kernel to generate session data
+  while processing this message.<a href="#section-6.1.7-2.1.3" class="pilcrow">¶</a></p>
+<p id="section-6.1.7-2.1.4">See an example in <a href="#example_early" class="auto internal xref">Appendix C</a>.<a href="#section-6.1.7-2.1.4" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-6.1.6-2.2">
-              <p id="section-6.1.6-2.2.1">Server-Side Usage:<a href="#section-6.1.6-2.2.1" class="pilcrow">¶</a></p>
-<p id="section-6.1.6-2.2.2">The server does not use this option to set or process a session
-  resumption ticket.<a href="#section-6.1.6-2.2.2" class="pilcrow">¶</a></p>
-<p id="section-6.1.6-2.2.3">The session resumption ticket SHOULD be issued via sendmsg() with
-  crypto_level QUIC_CRYPTO_APP in Handshake msg_control
-  <a href="#struct_handshake" class="auto internal xref">Section 4.3.2</a>.<a href="#section-6.1.6-2.2.3" class="pilcrow">¶</a></p>
-<p id="section-6.1.6-2.2.4">The optval type is null.<a href="#section-6.1.6-2.2.4" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-6.1.7-2.2">
+              <p id="section-6.1.7-2.2.1">For kernel consumers:<a href="#section-6.1.7-2.2.1" class="pilcrow">¶</a></p>
+<p id="section-6.1.7-2.2.2">After userspace handshake handles NEW_SESSION_TICKET messages, it
+  MUST return session data to kernel via this socket option, and kernel
+  consumers can get it via this socket option for session resumption
+  in future connections.<a href="#section-6.1.7-2.2.2" class="pilcrow">¶</a></p>
+<p id="section-6.1.7-2.2.3">During session resumption, kernel consumers will use this socket
+  option to inform userspace handshake about session data.<a href="#section-6.1.7-2.2.3" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-6.1.6-3">The default value in socket is null.<a href="#section-6.1.6-3" class="pilcrow">¶</a></p>
+<p id="section-6.1.7-3">The optval type is<a href="#section-6.1.7-3" class="pilcrow">¶</a></p>
+<div class="C lang-language sourcecode" id="section-6.1.7-4">
+<pre>
+uint8_t *opt;
+</pre><a href="#section-6.1.7-4" class="pilcrow">¶</a>
+</div>
+<p id="section-6.1.7-5">The default value in socket is null.<a href="#section-6.1.7-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sockopt_crypto_secret">
-<section id="section-6.1.7">
+<section id="section-6.1.8">
           <h4 id="name-quic_sockopt_crypto_secret">
-<a href="#section-6.1.7" class="section-number selfRef">6.1.7. </a><a href="#name-quic_sockopt_crypto_secret" class="section-name selfRef">QUIC_SOCKOPT_CRYPTO_SECRET</a>
+<a href="#section-6.1.8" class="section-number selfRef">6.1.8. </a><a href="#name-quic_sockopt_crypto_secret" class="section-name selfRef">QUIC_SOCKOPT_CRYPTO_SECRET</a>
           </h4>
-<p id="section-6.1.7-1">This socket option is used to set cryptographic secrets derived from
-userspace to the socket in kernel during the QUIC handshake process.<a href="#section-6.1.7-1" class="pilcrow">¶</a></p>
-<p id="section-6.1.7-2">The optval type is<a href="#section-6.1.7-2" class="pilcrow">¶</a></p>
-<div class="C lang-language sourcecode" id="section-6.1.7-3">
+<p id="section-6.1.8-1">This socket option is used to set cryptographic secrets derived from
+userspace to the socket in kernel during the QUIC handshake process.<a href="#section-6.1.8-1" class="pilcrow">¶</a></p>
+<p id="section-6.1.8-2">The optval type is<a href="#section-6.1.8-2" class="pilcrow">¶</a></p>
+<div class="C lang-language sourcecode" id="section-6.1.8-3">
 <pre>
 struct quic_crypto_secret {
   uint8_t level;
@@ -2992,83 +3085,83 @@ struct quic_crypto_secret {
   uint32_t type;
   uint8_t secret[48];
 };
-</pre><a href="#section-6.1.7-3" class="pilcrow">¶</a>
+</pre><a href="#section-6.1.8-3" class="pilcrow">¶</a>
 </div>
 <ul class="normal">
-<li class="normal" id="section-6.1.7-4.1">
-              <p id="section-6.1.7-4.1.1">level: Specifies the QUIC cryptographic level for which the secret
-  is intended.<a href="#section-6.1.7-4.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6.1.8-4.1">
+              <p id="section-6.1.8-4.1.1">level: Specifies the QUIC cryptographic level for which the secret
+  is intended.<a href="#section-6.1.8-4.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.1.7-4.1.2.1">QUIC_CRYPTO_APP: Application level<a href="#section-6.1.7-4.1.2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-6.1.8-4.1.2.1">QUIC_CRYPTO_APP: Application level<a href="#section-6.1.8-4.1.2.1" class="pilcrow">¶</a>
 </li>
-                <li class="normal" id="section-6.1.7-4.1.2.2">QUIC_CRYPTO_HANDSHAKE: Handshake level<a href="#section-6.1.7-4.1.2.2" class="pilcrow">¶</a>
+                <li class="normal" id="section-6.1.8-4.1.2.2">QUIC_CRYPTO_HANDSHAKE: Handshake level<a href="#section-6.1.8-4.1.2.2" class="pilcrow">¶</a>
 </li>
-                <li class="normal" id="section-6.1.7-4.1.2.3">QUIC_CRYPTO_EARLY: Early or 0-RTT level<a href="#section-6.1.7-4.1.2.3" class="pilcrow">¶</a>
+                <li class="normal" id="section-6.1.8-4.1.2.3">QUIC_CRYPTO_EARLY: Early or 0-RTT level<a href="#section-6.1.8-4.1.2.3" class="pilcrow">¶</a>
 </li>
               </ul>
 </li>
-            <li class="normal" id="section-6.1.7-4.2">
-              <p id="section-6.1.7-4.2.1">send: Indicates the direction of the secret.<a href="#section-6.1.7-4.2.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-6.1.8-4.2">
+              <p id="section-6.1.8-4.2.1">send: Indicates the direction of the secret.<a href="#section-6.1.8-4.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.1.7-4.2.2.1">0: Set secret for receiving<a href="#section-6.1.7-4.2.2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-6.1.8-4.2.2.1">0: Set secret for receiving<a href="#section-6.1.8-4.2.2.1" class="pilcrow">¶</a>
 </li>
-                <li class="normal" id="section-6.1.7-4.2.2.2">!0: Set secret for sending<a href="#section-6.1.7-4.2.2.2" class="pilcrow">¶</a>
+                <li class="normal" id="section-6.1.8-4.2.2.2">!0: Set secret for sending<a href="#section-6.1.8-4.2.2.2" class="pilcrow">¶</a>
 </li>
               </ul>
 </li>
-            <li class="normal" id="section-6.1.7-4.3">
-              <p id="section-6.1.7-4.3.1">type: Specifies the encryption algorithm used.<a href="#section-6.1.7-4.3.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-6.1.8-4.3">
+              <p id="section-6.1.8-4.3.1">type: Specifies the encryption algorithm used.<a href="#section-6.1.8-4.3.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.1.7-4.3.2.1">AES_GCM_128<a href="#section-6.1.7-4.3.2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-6.1.8-4.3.2.1">AES_GCM_128<a href="#section-6.1.8-4.3.2.1" class="pilcrow">¶</a>
 </li>
-                <li class="normal" id="section-6.1.7-4.3.2.2">AES_GCM_256<a href="#section-6.1.7-4.3.2.2" class="pilcrow">¶</a>
+                <li class="normal" id="section-6.1.8-4.3.2.2">AES_GCM_256<a href="#section-6.1.8-4.3.2.2" class="pilcrow">¶</a>
 </li>
-                <li class="normal" id="section-6.1.7-4.3.2.3">AES_CCM_128<a href="#section-6.1.7-4.3.2.3" class="pilcrow">¶</a>
+                <li class="normal" id="section-6.1.8-4.3.2.3">AES_CCM_128<a href="#section-6.1.8-4.3.2.3" class="pilcrow">¶</a>
 </li>
-                <li class="normal" id="section-6.1.7-4.3.2.4">CHACHA20_POLY1305<a href="#section-6.1.7-4.3.2.4" class="pilcrow">¶</a>
+                <li class="normal" id="section-6.1.8-4.3.2.4">CHACHA20_POLY1305<a href="#section-6.1.8-4.3.2.4" class="pilcrow">¶</a>
 </li>
               </ul>
 </li>
-            <li class="normal" id="section-6.1.7-4.4">
-              <p id="section-6.1.7-4.4.1">secret: The cryptographic key material to be used. The length of
+            <li class="normal" id="section-6.1.8-4.4">
+              <p id="section-6.1.8-4.4.1">secret: The cryptographic key material to be used. The length of
   this array depends on the type and SHOULD be filled accordingly in
-  kernel.<a href="#section-6.1.7-4.4.1" class="pilcrow">¶</a></p>
+  kernel.<a href="#section-6.1.8-4.4.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-6.1.7-5">This option is only relevant during the handshake phase.<a href="#section-6.1.7-5" class="pilcrow">¶</a></p>
+<p id="section-6.1.8-5">This option is only relevant during the handshake phase.<a href="#section-6.1.8-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sockopt_transport_param_ext">
-<section id="section-6.1.8">
+<section id="section-6.1.9">
           <h4 id="name-quic_sockopt_transport_param">
-<a href="#section-6.1.8" class="section-number selfRef">6.1.8. </a><a href="#name-quic_sockopt_transport_param" class="section-name selfRef">QUIC_SOCKOPT_TRANSPORT_PARAM_EXT</a>
+<a href="#section-6.1.9" class="section-number selfRef">6.1.9. </a><a href="#name-quic_sockopt_transport_param" class="section-name selfRef">QUIC_SOCKOPT_TRANSPORT_PARAM_EXT</a>
           </h4>
-<p id="section-6.1.8-1">This socket option is used to retrieve or set the QUIC Transport
+<p id="section-6.1.9-1">This socket option is used to retrieve or set the QUIC Transport
 Parameters Extension, which is essential for building TLS messages and
 handling extended QUIC transport parameters during the handshake
-process.<a href="#section-6.1.8-1" class="pilcrow">¶</a></p>
+process.<a href="#section-6.1.9-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.1.8-2.1">
-              <p id="section-6.1.8-2.1.1">Get Operation:<a href="#section-6.1.8-2.1.1" class="pilcrow">¶</a></p>
-<p id="section-6.1.8-2.1.2">When retrieving parameters via getsockopt, this option generates the
+<li class="normal" id="section-6.1.9-2.1">
+              <p id="section-6.1.9-2.1.1">Get Operation:<a href="#section-6.1.9-2.1.1" class="pilcrow">¶</a></p>
+<p id="section-6.1.9-2.1.2">When retrieving parameters via getsockopt, this option generates the
   QUIC Transport Parameters Extension based on the local transport
   parameters configured in kernel. The retrieved extension helps
-  userspace applications build the appropriate TLS messages.<a href="#section-6.1.8-2.1.2" class="pilcrow">¶</a></p>
+  userspace applications build the appropriate TLS messages.<a href="#section-6.1.9-2.1.2" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-6.1.8-2.2">
-              <p id="section-6.1.8-2.2.1">Set Operation:<a href="#section-6.1.8-2.2.1" class="pilcrow">¶</a></p>
-<p id="section-6.1.8-2.2.2">When setting parameters via setsockopt, this option updates kernel
+            <li class="normal" id="section-6.1.9-2.2">
+              <p id="section-6.1.9-2.2.1">Set Operation:<a href="#section-6.1.9-2.2.1" class="pilcrow">¶</a></p>
+<p id="section-6.1.9-2.2.2">When setting parameters via setsockopt, this option updates kernel
   with the QUIC Transport Parameters Extension received from the peer's
   TLS message. This ensures that the remote transport parameters are
-  correctly configured in the kernel.<a href="#section-6.1.8-2.2.2" class="pilcrow">¶</a></p>
+  correctly configured in the kernel.<a href="#section-6.1.9-2.2.2" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<div class="C lang-language sourcecode" id="section-6.1.8-3">
+<div class="C lang-language sourcecode" id="section-6.1.9-3">
 <pre>
 uint8_t *opt;
-</pre><a href="#section-6.1.8-3" class="pilcrow">¶</a>
+</pre><a href="#section-6.1.9-3" class="pilcrow">¶</a>
 </div>
-<p id="section-6.1.8-4">This option is used exclusively during the handshake phase.<a href="#section-6.1.8-4" class="pilcrow">¶</a></p>
+<p id="section-6.1.9-4">This option is used exclusively during the handshake phase.<a href="#section-6.1.9-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -3251,7 +3344,7 @@ are two methods to handle this interaction:<a href="#section-7-1" class="pilcrow
       </ul>
 <p id="section-7-3">On Linux, the tlshd service utilizes the first method via Netlink.<a href="#section-7-3" class="pilcrow">¶</a></p>
 <p id="section-7-4">For further details on the infrastructure design in Linux, refer to
-<a href="#example_kernel" class="auto internal xref">Appendix C</a><a href="#section-7-4" class="pilcrow">¶</a></p>
+<a href="#example_kernel" class="auto internal xref">Appendix D</a><a href="#section-7-4" class="pilcrow">¶</a></p>
 </section>
 <section id="section-8">
       <h2 id="name-iana-considerations">
@@ -3367,7 +3460,8 @@ static int do_client(int argc, char *argv[])
     char msg[50];
 
     if (argc &lt; 3) {
-        printf("%s client &lt;PEER ADDR&gt; &lt;PEER PORT&gt;\n", argv[0]);
+        printf("%s client &lt;PEER ADDR&gt; &lt;PEER PORT&gt; [ALPN]\n",
+               argv[0]);
         return 0;
     }
 
@@ -3386,10 +3480,14 @@ static int do_client(int argc, char *argv[])
         return -1;
     }
 
-    if (quic_client_handshake(sockfd, NULL, NULL))
+    if (quic_client_handshake(sockfd, NULL, NULL, argv[4]))
         return -1;
 
-    /* Open stream 0 and send first data on stream 0 */
+    /* Open stream 0 and send first data on stream 0 with
+     * MSG_STREAM_NEW, or call getsockopt(QUIC_SOCKOPT_STREAM_OPEN)
+     * to open a stream and then send data with out MSG_STREAM_NEW
+     * needed
+     */
     strcpy(msg, "hello ");
     sid = 0;
     flags = MSG_STREAM_NEW;
@@ -3422,7 +3520,9 @@ static int do_client(int argc, char *argv[])
     }
     stream[sid &gt;&gt; 1].len += ret;
 
-    /* Send second (last) data on stream 2 */
+    /* Send second (last) data on stream 2 and then close stream
+     * 2 with MSG_STREAM_FIN
+     */
     strcpy(msg, "server stream 2!");
     sid = 2;
     flags = MSG_STREAM_FIN;
@@ -3474,7 +3574,8 @@ static int do_server(int argc, char *argv[])
 
     if (argc &lt; 5) {
         printf("%s server &lt;LOCAL ADDR&gt; &lt;LOCAL PORT&gt;"
-               "&lt;PRIVATE_KEY_FILE&gt; &lt;CERTIFICATE_FILE&gt;\n", argv[0]);
+               "&lt;PRIVATE_KEY_FILE&gt; &lt;CERTIFICATE_FILE&gt; [ALPN]\n",
+               argv[0]);
         return 0;
     }
 
@@ -3501,7 +3602,7 @@ static int do_server(int argc, char *argv[])
         return -1;
     }
 
-    if (quic_server_handshake(sockfd, argv[4], argv[5]))
+    if (quic_server_handshake(sockfd, argv[4], argv[5], argv[6]))
         return -1;
 
     while (!(stream[0].flags &amp; MSG_STREAM_FIN) ||
@@ -3555,15 +3656,256 @@ int main(int argc, char *argv[])
 </div>
 </section>
 </div>
-<div id="example_early">
+<div id="example_early_handshake">
 <section id="appendix-B">
-      <h2 id="name-example-for-session-consump">
-<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-example-for-session-consump" class="section-name selfRef">Example For Session Consumption and 0-RTT transmission</a>
+      <h2 id="name-example-for-defining-custom">
+<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-example-for-defining-custom" class="section-name selfRef">Example For defining custom client/server_handshake()</a>
       </h2>
-<p id="appendix-B-1">This example illustrates how to use the socket options TOKEN,
-SESSION_TICKET, and TRANSPORT_PARAM to achieve session resumption
-and 0-RTT data transmission with QUIC.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+<p id="appendix-B-1">This example demonstrates how to use quic_handshake() to define
+client_handshake() and server_handshake() for session resumption using
+GnuTLS.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
 <div class="C breakable lang-language sourcecode" id="appendix-B-2">
+<pre>
+#include &lt;sys/socket.h&gt;
+#include &lt;arpa/inet.h&gt;
+#include &lt;string.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;errno.h&gt;
+
+#include &lt;netinet/quic.h&gt;
+
+static int quic_session_get_data(gnutls_session_t session,
+                                 void *data, size_t *size)
+{
+    int ret, sockfd = gnutls_transport_get_int(session);
+    unsigned int len = *size;
+
+    if (getsockopt(sockfd, SOL_QUIC, QUIC_SOCKOPT_SESSION_TICKET,
+                   data, &amp;len))
+        return -errno;
+    if (!len) {
+        *size = 0;
+        return 0;
+    }
+
+    ret = quic_handshake_process(session, QUIC_CRYPTO_APP,
+                                 data, len);
+    if (ret)
+        return ret;
+    return gnutls_session_get_data(session, data, size);
+}
+
+static int quic_session_set_data(gnutls_session_t session,
+                                 const void *data, size_t size)
+{
+    return gnutls_session_set_data(session, data, size);
+}
+
+static int quic_session_get_alpn(gnutls_session_t session,
+                                 void *alpn, size_t *size)
+{
+    gnutls_datum_t alpn_data;
+    int ret;
+
+    ret = gnutls_alpn_get_selected_protocol(session, &amp;alpn_data);
+    if (ret)
+        return ret;
+
+    if (*size &lt; alpn_data.size)
+        return -EINVAL;
+
+    memcpy(alpn, alpn_data.data, alpn_data.size);
+    *size = alpn_data.size;
+    return 0;
+}
+
+static int quic_session_set_alpn(gnutls_session_t session,
+                                 const void *alpns, size_t size)
+{
+    gnutls_datum_t alpn_data[5];
+    char *s, data[64] = {};
+    int count = 0;
+
+    if (size &gt;= 64)
+        return -EINVAL;
+
+    memcpy(data, alpns, size);
+    s = strtok(data, ",");
+    while (s) {
+        while (*s == ' ')
+            s++;
+        alpn_data[count].data = (unsigned char *)s;
+        alpn_data[count].size = strlen(s);
+        count++;
+        s = strtok(NULL, ",");
+    }
+
+    return gnutls_alpn_set_protocols(session, alpn_data, count,
+                                     GNUTLS_ALPN_MANDATORY);
+}
+
+static int client_handshake(int sockfd, const char *alpns,
+                            const uint8_t *ticket_in,
+                            size_t ticket_in_len,
+                            uint8_t *ticket_out,
+                            size_t *ticket_out_len)
+{
+    gnutls_certificate_credentials_t cred;
+    gnutls_session_t session;
+    size_t alpn_len;
+    char alpn[64];
+    int ret;
+
+    ret = gnutls_certificate_allocate_credentials(&amp;cred);
+    if (ret)
+        goto err;
+    ret = gnutls_certificate_set_x509_system_trust(cred);
+    if (ret &lt; 0)
+        goto err_cred;
+
+    ret = gnutls_init(&amp;session, GNUTLS_CLIENT |
+                                    GNUTLS_ENABLE_EARLY_DATA |
+                                    GNUTLS_NO_END_OF_EARLY_DATA);
+    if (ret)
+        goto err_cred;
+    ret = gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
+                                 cred);
+    if (ret)
+        goto err_session;
+
+    ret = gnutls_priority_set_direct(session, QUIC_PRIORITY, NULL);
+    if (ret)
+        goto err_session;
+
+    if (alpns) {
+        ret = quic_session_set_alpn(session, alpns, strlen(alpns));
+        if (ret)
+            goto err_session;
+    }
+
+    if (host) {
+        ret = gnutls_server_name_set(session, GNUTLS_NAME_DNS, host,
+                                     strlen(host));
+        if (ret)
+            goto err_session;
+    }
+
+    gnutls_transport_set_int(session, sockfd);
+
+    if (ticket_in) {
+        ret = quic_session_set_data(session, ticket_in,
+                                    ticket_in_len);
+        if (ret)
+            goto err_session;
+    }
+
+    ret = quic_handshake(session);
+    if (ret)
+        goto err_session;
+
+    if (alpns) {
+        alpn_len = sizeof(alpn);
+        ret = quic_session_get_alpn(session, alpn, &amp;alpn_len);
+        if (ret)
+            goto err_session;
+    }
+
+    if (ticket_out) {
+        sleep(1);
+        ret = quic_session_get_data(session, ticket_out,
+                                    ticket_out_len);
+        if (ret)
+            goto err_session;
+    }
+
+err_session:
+    gnutls_deinit(session);
+err_cred:
+    gnutls_certificate_free_credentials(cred);
+err:
+    return ret;
+}
+
+static int server_handshake(int sockfd, const char *pkey,
+                            const char *cert, const char *alpns,
+                            uint8_t *key, unsigned int keylen)
+{
+    gnutls_certificate_credentials_t cred;
+    gnutls_datum_t skey = {key, keylen};
+    gnutls_session_t session;
+    size_t alpn_len;
+    char alpn[64];
+    int ret;
+
+    ret = gnutls_certificate_allocate_credentials(&amp;cred);
+    if (ret)
+        goto err;
+    ret = gnutls_certificate_set_x509_system_trust(cred);
+    if (ret &lt; 0)
+        goto err_cred;
+    ret = gnutls_certificate_set_x509_key_file(cred, cert, pkey,
+                                               GNUTLS_X509_FMT_PEM);
+    if (ret)
+        goto err_cred;
+    ret = gnutls_init(&amp;session, GNUTLS_SERVER |
+                                    GNUTLS_NO_AUTO_SEND_TICKET |
+                                    GNUTLS_ENABLE_EARLY_DATA |
+                                    GNUTLS_NO_END_OF_EARLY_DATA);
+    if (ret)
+        goto err_cred;
+    ret = gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
+                                 cred);
+    if (ret)
+        goto err_session;
+
+    ret = gnutls_session_ticket_enable_server(session, &amp;skey);
+    if (ret)
+        goto err_session;
+
+    ret = gnutls_priority_set_direct(session, QUIC_PRIORITY, NULL);
+    if (ret)
+        goto err_session;
+
+    if (alpns) {
+        ret = quic_session_set_alpn(session, alpns, strlen(alpns));
+        if (ret)
+            goto err_session;
+    }
+
+    gnutls_transport_set_int(session, sockfd);
+
+    ret = quic_handshake(session);
+    if (ret)
+        goto err_session;
+
+    if (alpns) {
+        alpn_len = sizeof(alpn);
+        ret = quic_session_get_alpn(session, alpn, &amp;alpn_len);
+    }
+
+err_session:
+    gnutls_deinit(session);
+err_cred:
+    gnutls_certificate_free_credentials(cred);
+err:
+    return ret;
+}
+</pre><a href="#appendix-B-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="example_early">
+<section id="appendix-C">
+      <h2 id="name-example-for-session-consump">
+<a href="#appendix-C" class="section-number selfRef">Appendix C. </a><a href="#name-example-for-session-consump" class="section-name selfRef">Example For Session Consumption and 0-RTT transmission</a>
+      </h2>
+<p id="appendix-C-1">This example illustrates how to use the socket options TOKEN,
+SESSION_TICKET, and TRANSPORT_PARAM to achieve session resumption
+and 0-RTT data transmission with QUIC (client_handshake() and
+server are from <a href="#example_early_handshake" class="auto internal xref">Appendix B</a>).<a href="#appendix-C-1" class="pilcrow">¶</a></p>
+<div class="C breakable lang-language sourcecode" id="appendix-C-2">
 <pre>
 #include &lt;sys/socket.h&gt;
 #include &lt;arpa/inet.h&gt;
@@ -3580,14 +3922,17 @@ static uint8_t token[256];
 
 static int do_client(int argc, char *argv[])
 {
-    unsigned int ticket_len, param_len, token_len, addr_len;
+    unsigned int param_len, token_len, addr_len, flags;
     struct quic_transport_param param = {};
     struct sockaddr_in ra = {}, la = {};
+    char msg[50], *alpn;
+    size_t ticket_len;
     int ret, sockfd;
-    char msg[50];
+    int64_t sid;
 
     if (argc &lt; 3) {
-        printf("%s client &lt;PEER ADDR&gt; &lt;PEER PORT&gt;\n", argv[0]);
+        printf("%s client &lt;PEER ADDR&gt; &lt;PEER PORT&gt; [ALPN]\n",
+               argv[0]);
         return 0;
     }
 
@@ -3606,26 +3951,14 @@ static int do_client(int argc, char *argv[])
         return -1;
     }
 
-    param.receive_session_ticket = 1;
-    param_len = sizeof(param);
-    ret = setsockopt(sockfd, SOL_QUIC, QUIC_SOCKOPT_TRANSPORT_PARAM,
-                     &amp;param, param_len);
-    if (ret == -1)
-        return -1;
-
-    if (quic_client_handshake(sockfd, NULL, NULL))
-        return -1;
-
-    /* get ticket and param after handshake (you can save
-     * it somewhere).
+    /* get ticket and param after handshake
+     * (you can save it somewhere).
      */
+    alpn = argv[4];
     ticket_len = sizeof(ticket);
-    ret = getsockopt(sockfd, SOL_QUIC, QUIC_SOCKOPT_SESSION_TICKET,
-                     ticket, &amp;ticket_len);
-    if (ret == -1 || !ticket_len) {
-        printf("socket getsockopt session ticket\n");
+    if (client_handshake(sockfd, alpn, NULL, NULL, ticket,
+                         &amp;ticket_len))
         return -1;
-    }
 
     param_len = sizeof(param);
     param.remote = 1;
@@ -3636,9 +3969,6 @@ static int do_client(int argc, char *argv[])
         return -1;
     }
 
-    /* get token and local address (needed when peer
-     * validate_address is set).
-     */
     token_len = sizeof(token);
     ret = getsockopt(sockfd, SOL_QUIC, QUIC_SOCKOPT_TOKEN, &amp;token,
                      &amp;token_len);
@@ -3658,20 +3988,23 @@ static int do_client(int argc, char *argv[])
            "token %d, save it\n", ticket_len, param_len, token_len);
 
     strcpy(msg, "hello quic server!");
-    ret = send(sockfd, msg, strlen(msg), MSG_SYN | MSG_FIN);
+    sid = (0 | QUIC_STREAM_TYPE_UNI_MASK);
+    flags = MSG_STREAM_NEW | MSG_STREAM_FIN;
+    ret = quic_sendmsg(sockfd, msg, strlen(msg), sid, flags);
     if (ret == -1) {
         printf("send error %d %d\n", ret, errno);
         return -1;
     }
-    printf("send %d\n", ret);
+    printf("send '%s' on stream %ld\n", msg, sid);
 
     memset(msg, 0, sizeof(msg));
-    ret = recv(sockfd, msg, sizeof(msg), 0);
+    flags = 0;
+    ret = quic_recvmsg(sockfd, msg, sizeof(msg) - 1, &amp;sid, &amp;flags);
     if (ret == -1) {
         printf("recv error %d %d\n", ret, errno);
         return 1;
     }
-    printf("recv: \"%s\", len: %d\n", msg, ret);
+    printf("recv '%s' on stream %ld\n", msg, sid);
 
     close(sockfd);
 
@@ -3684,17 +4017,11 @@ static int do_client(int argc, char *argv[])
         return -1;
     }
 
-    /* bind previous address and port and set token for
-     * address validation.
+    /* bind previous address:port and set token for address
+     * validation
      */
     if (bind(sockfd, (struct sockaddr *)&amp;la, addr_len)) {
         printf("socket bind failed\n");
-        return -1;
-    }
-    ret = setsockopt(sockfd, SOL_QUIC, QUIC_SOCKOPT_TOKEN, token,
-                     token_len);
-    if (ret == -1) {
-        printf("socket setsockopt token\n");
         return -1;
     }
 
@@ -3710,36 +4037,43 @@ static int do_client(int argc, char *argv[])
     /* set the ticket and remote param and early data into
      * the socket for handshake.
      */
-    ret = setsockopt(sockfd, SOL_QUIC, QUIC_SOCKOPT_SESSION_TICKET,
-                     ticket, ticket_len);
+    ret = setsockopt(sockfd, SOL_QUIC, QUIC_SOCKOPT_TOKEN, token,
+                     token_len);
     if (ret == -1) {
-        printf("socket setsockopt session ticket\n");
+        printf("socket setsockopt token\n");
         return -1;
     }
+
     ret = setsockopt(sockfd, SOL_QUIC, QUIC_SOCKOPT_TRANSPORT_PARAM,
                      &amp;param, param_len);
     if (ret == -1) {
         printf("socket setsockopt remote transport param\n");
         return -1;
     }
+
+    /* send early data before handshake */
     strcpy(msg, "hello quic server, I'm back!");
-    ret = send(sockfd, msg, strlen(msg), MSG_SYN | MSG_FIN);
+    sid = (0 | QUIC_STREAM_TYPE_UNI_MASK);
+    flags = MSG_STREAM_NEW | MSG_STREAM_FIN;
+    ret = quic_sendmsg(sockfd, msg, strlen(msg), sid, flags);
     if (ret == -1) {
         printf("send error %d %d\n", ret, errno);
         return -1;
     }
-    printf("send %d\n", ret);
+    printf("send '%s' on stream %ld\n", msg, sid);
 
-    if (quic_client_handshake(sockfd, NULL, NULL))
+    if (client_handshake(sockfd, alpn, ticket, ticket_len, NULL,
+                         NULL))
         return -1;
 
     memset(msg, 0, sizeof(msg));
-    ret = recv(sockfd, msg, sizeof(msg), 0);
+    flags = 0;
+    ret = quic_recvmsg(sockfd, msg, sizeof(msg) - 1, &amp;sid, &amp;flags);
     if (ret == -1) {
         printf("recv error %d %d\n", ret, errno);
         return 1;
     }
-    printf("recv: \"%s\", len: %d\n", msg, ret);
+    printf("recv '%s' on stream %ld\n", msg, sid);
 
     close(sockfd);
     return 0;
@@ -3747,15 +4081,18 @@ static int do_client(int argc, char *argv[])
 
 static int do_server(int argc, char *argv[])
 {
-    struct quic_transport_param param = {};
+    unsigned int addrlen, keylen, flags;
+    struct quic_config config = {};
     struct sockaddr_in sa = {};
     int listenfd, sockfd, ret;
-    unsigned int addrlen;
-    char msg[50];
+    char msg[50], *alpn;
+    uint8_t key[64];
+    int64_t sid;
 
     if (argc &lt; 5) {
-        printf("%s server &lt;LOCAL ADDR&gt; &lt;LOCAL PORT&gt;"
-               "&lt;PRIVATE_KEY_FILE&gt; &lt;CERTIFICATE_FILE&gt;\n", argv[0]);
+        printf("%s server &lt;LOCAL ADDR&gt; &lt;LOCAL PORT&gt; "
+               "&lt;PRIVATE_KEY_FILE&gt; &lt;CERTIFICATE_FILE&gt;\n",
+               argv[0]);
         return 0;
     }
 
@@ -3771,14 +4108,22 @@ static int do_server(int argc, char *argv[])
         printf("socket bind failed\n");
         return -1;
     }
+    alpn = argv[6];
+    if (alpn &amp;&amp; setsockopt(listenfd, SOL_QUIC, QUIC_SOCKOPT_ALPN,
+                           alpn, strlen(alpn))) {
+        printf("socket setsockopt alpn failed\n");
+        return -1;
+    }
+
     if (listen(listenfd, 1)) {
         printf("socket listen failed\n");
         return -1;
     }
-    param.validate_peer_address = 1;
-    if (setsockopt(listenfd, SOL_QUIC, QUIC_SOCKOPT_TRANSPORT_PARAM,
-                   &amp;param, sizeof(param)))
+    config.validate_peer_address = 1; /* trigger retry packet */
+    if (setsockopt(listenfd, SOL_QUIC, QUIC_SOCKOPT_CONFIG, &amp;config,
+                   sizeof(config)))
         return -1;
+
     addrlen = sizeof(sa);
     sockfd = accept(listenfd, (struct sockaddr *)&amp;sa, &amp;addrlen);
     if (sockfd &lt; 0) {
@@ -3786,24 +4131,35 @@ static int do_server(int argc, char *argv[])
         return -1;
     }
 
-    if (quic_server_handshake(sockfd, argv[4], argv[5]))
+    keylen = sizeof(key);
+    if (getsockopt(sockfd, SOL_QUIC, QUIC_SOCKOPT_SESSION_TICKET,
+                   key, &amp;keylen)) {
+        printf("socket getsockopt session ticket error %d", errno);
+        return -1;
+    }
+
+    if (server_handshake(sockfd, argv[4], argv[5], alpn, key,
+                         keylen))
         return -1;
 
     memset(msg, 0, sizeof(msg));
-    ret = recv(sockfd, msg, sizeof(msg), 0);
+    flags = 0;
+    ret = quic_recvmsg(sockfd, msg, sizeof(msg) - 1, &amp;sid, &amp;flags);
     if (ret == -1) {
         printf("recv error %d %d\n", ret, errno);
         return 1;
     }
-    printf("recv: \"%s\", len: %d\n", msg, ret);
+    printf("recv '%s' on stream %ld\n", msg, sid);
 
     strcpy(msg, "hello quic client!");
-    ret = send(sockfd, msg, strlen(msg), MSG_SYN | MSG_FIN);
+    sid = (0 | QUIC_STREAM_TYPE_SERVER_MASK);
+    flags = MSG_STREAM_NEW | MSG_STREAM_FIN;
+    ret = quic_sendmsg(sockfd, msg, strlen(msg), sid, flags);
     if (ret == -1) {
         printf("send error %d %d\n", ret, errno);
         return -1;
     }
-    printf("send %d\n", ret);
+    printf("send '%s' on stream %ld\n", msg, sid);
 
     close(sockfd);
 
@@ -3816,24 +4172,28 @@ static int do_server(int argc, char *argv[])
         return -1;
     }
 
-    if (quic_server_handshake(sockfd, argv[4], argv[5]))
+    if (server_handshake(sockfd, argv[4], argv[5], alpn, key,
+                         keylen))
         return -1;
 
     memset(msg, 0, sizeof(msg));
-    ret = recv(sockfd, msg, sizeof(msg), 0);
+    flags = 0;
+    ret = quic_recvmsg(sockfd, msg, sizeof(msg) - 1, &amp;sid, &amp;flags);
     if (ret == -1) {
         printf("recv error %d %d\n", ret, errno);
         return 1;
     }
-    printf("recv: \"%s\", len: %d\n", msg, ret);
+    printf("recv '%s' on stream %ld\n", msg, sid);
 
     strcpy(msg, "hello quic client! welcome back!");
-    ret = send(sockfd, msg, strlen(msg), MSG_SYN | MSG_FIN);
+    sid = (0 | QUIC_STREAM_TYPE_SERVER_MASK);
+    flags = MSG_STREAM_NEW | MSG_STREAM_FIN;
+    ret = quic_sendmsg(sockfd, msg, strlen(msg), sid, flags);
     if (ret == -1) {
         printf("send error %d %d\n", ret, errno);
         return -1;
     }
-    printf("send %d\n", ret);
+    printf("send '%s' on stream %ld\n", msg, sid);
 
     close(sockfd);
     close(listenfd);
@@ -3842,8 +4202,8 @@ static int do_server(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-    if (argc &lt; 2 || (strcmp(argv[1], "server") &amp;&amp;
-        strcmp(argv[1], "client"))) {
+    if (argc &lt; 2 ||
+        (strcmp(argv[1], "server") &amp;&amp; strcmp(argv[1], "client"))) {
         printf("%s server|client ...\n", argv[0]);
         return 0;
     }
@@ -3853,18 +4213,18 @@ int main(int argc, char *argv[])
 
     return do_server(argc, argv);
 }
-</pre><a href="#appendix-B-2" class="pilcrow">¶</a>
+</pre><a href="#appendix-C-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="example_kernel">
-<section id="appendix-C">
+<section id="appendix-D">
       <h2 id="name-example-for-kernel-consumer">
-<a href="#appendix-C" class="section-number selfRef">Appendix C. </a><a href="#name-example-for-kernel-consumer" class="section-name selfRef">Example For Kernel Consumers Architecture Design</a>
+<a href="#appendix-D" class="section-number selfRef">Appendix D. </a><a href="#name-example-for-kernel-consumer" class="section-name selfRef">Example For Kernel Consumers Architecture Design</a>
       </h2>
-<p id="appendix-C-1">In-kernel QUIC facilitates integration with kernel consumers. Below is
-the design architecture for handling QUIC handshakes in Linux kernel:<a href="#appendix-C-1" class="pilcrow">¶</a></p>
-<div class="C lang-language sourcecode" id="appendix-C-2">
+<p id="appendix-D-1">In-kernel QUIC facilitates integration with kernel consumers. Below is
+the design architecture for handling QUIC handshakes in Linux kernel:<a href="#appendix-D-1" class="pilcrow">¶</a></p>
+<div class="C lang-language sourcecode" id="appendix-D-2">
 <pre>
 ┌──────┐  ┌──────┐
 │ APP1 │  │ APP2 │ ...
@@ -3891,12 +4251,12 @@ Kernel        │ │                  │ │                  │   │
 ├──────────────────────────────────────────┤   │   │     │ │     │
 │                UDP tunnels               │   │   └─────┘ └─────┘
 └──────────────────────────────────────────┘   └──────┴───────┘
-</pre><a href="#appendix-C-2" class="pilcrow">¶</a>
+</pre><a href="#appendix-D-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="authors-addresses">
-<section id="appendix-D">
+<section id="appendix-E">
       <h2 id="name-authors-address">
 <a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
       </h2>
