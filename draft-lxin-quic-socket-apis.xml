@@ -203,7 +203,7 @@ listening.</li>
 Client Initial packet and direct the incoming request based on it to
 different listening sockets (binding to the same address and port).
 These sockets could belong to different user processes or kernel
-threads. The ALPNs for sockets are set via the socket option ALPN
+threads. The ALPNs for sockets are set via the ALPN socket option
 <xref target='sockopt_alpn'/> before calling listen().</t>
 </section>
 <section title='accept()'>
@@ -560,7 +560,7 @@ packets.</t>
 </li>
 <li><t>Setting Secrets for Different Crypto Levels:</t>
 <t>The implementation SHOULD set secrets for various crypto levels using
-socket option CRYPTO_SECRET <xref target='sockopt_crypto_secret'/>.</t>
+the CRYPTO_SECRET socket option <xref target='sockopt_crypto_secret'/>.</t>
 </li>
 </ul>
 </section>
@@ -832,7 +832,7 @@ in msg_flags of msghdr in <xref target='struct_stream'/>.</t>
 corresponding to one of the values in the quic_event_type enum. The
 subsequent bytes contain the content of the event, meaning the length of
 the content is the total data length minus one byte. To manage and enable
-these events, refer to socket option EVENT
+these events, refer to the EVENT socket option
 <xref target='sockopt_event'/>.</t>
 <section title='QUIC Notification Structure' anchor='notification'>
 <section title='QUIC_EVENT_STREAM_UPDATE'>
@@ -847,8 +847,8 @@ userspace:</t>
 <li><t>QUIC_STREAM_SEND_STATE_RESET_SENT</t>
   <t>An update is delivered only if a STOP_SENDING frame is received from
   the peer and a STREAM_RESET frame is triggered to send out. The
-  STOP_SENDING frame MAY be sent by the peer via the socket option
-  STREAM_STOP_SENDING <xref target='sockopt_stream_stop_sending'/>.</t>
+  STOP_SENDING frame MAY be sent by the peer via the STREAM_STOP_SENDING
+  socket option <xref target='sockopt_stream_stop_sending'/>.</t>
 </li>
 <li><t>QUIC_STREAM_SEND_STATE_RESET_RECVD</t>
   <t>An update is delivered when a STREAM_RESET frame has been received and
@@ -889,7 +889,7 @@ struct quic_stream_update {
 <section title='QUIC_EVENT_STREAM_MAX_STREAM'>
 <t>This notification is delivered when a MAX_STREAMS frame is received. It
 is particularly useful when using MSG_STREAM_DONTWAIT stream_flags to open
-a stream via the socket option STREAM_OPEN <xref target='sockopt_stream_open'/>
+a stream via the STREAM_OPEN socket option <xref target='sockopt_stream_open'/>
 whose ID exceeds the current maximum stream count. After receiving this
 notification, the application SHOULD attempt to open the stream again.</t>
 <t>Data format in the event</t>
@@ -899,8 +899,8 @@ uint64_t max_stream;
 </section>
 <section title='QUIC_EVENT_CONNECTION_CLOSE'>
 <t>This notification is delivered when a CLOSE frame is received from the
-peer. The peer MAY set the close information via the socket option
-CONNECTION_CLOSE <xref target='sockopt_close'/> before calling close().</t>
+peer. The peer MAY set the close information via the CONNECTION_CLOSE socket
+option <xref target='sockopt_close'/> before calling close().</t>
 <t>Data format in the event</t>
 <sourcecode type='language C'>
 struct quic_connection_close {
@@ -912,7 +912,7 @@ struct quic_connection_close {
 </section>
 <section title='QUIC_EVENT_CONNECTION_MIGRATION'>
 <t>This notification is delivered when either side successfully changes its
-source address using the socket option CONNECTION_MIGRATION
+source address using the CONNECTION_MIGRATION socket option
 <xref target='sockopt_migration'/>, or when the destination address is
 changed by the peer's connection migration. The notification includes a
 parameter indicating whether the migration was local or initiated by the
@@ -926,7 +926,7 @@ uint8_t local_migration;
 </section>
 <section title='QUIC_EVENT_KEY_UPDATE'>
 <t>This notification is delivered when both sides have successfully updated
-to the new key phase after a key update via the socket option KEY_UPDATE
+to the new key phase after a key update via the KEY_UPDATE socket option
 <xref target='sockopt_key_update'/> on either side. The parameter
 indicates which key phase is currently in use.</t>
 <t>Data format in the event</t>
@@ -937,7 +937,7 @@ uint8_t key_update_phase;
 <section title='QUIC_EVENT_NEW_TOKEN' anchor='event_new_token'>
 <t>This notification is delivered whenever a NEW_TOKEN frame is received
 from the peer. Since the handshake occurs in userspace, you can send these
-tokens using socket option TOKEN <xref target='sockopt_new_token'/>.</t>
+tokens using the TOKEN socket option <xref target='sockopt_new_token'/>.</t>
 <t>Data format in the event</t>
 <sourcecode type='language C'>
 uint8_t *token;
@@ -1919,8 +1919,8 @@ err:
 
 <section title='Example For Session Consumption and 0-RTT transmission'
   anchor='example_early'>
-<t>This example illustrates how to use the socket options TOKEN,
-SESSION_TICKET, and TRANSPORT_PARAM to achieve session resumption
+<t>This example illustrates how to use the TOKEN, SESSION_TICKET, and
+TRANSPORT_PARAM socket options to achieve session resumption
 and 0-RTT data transmission with QUIC (client_handshake() and
 server are from <xref target='example_early_handshake'/>).</t>
 <sourcecode type='language C'>
