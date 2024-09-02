@@ -65,7 +65,7 @@ Protocol suite to many operating systems.  Both TCP
 <xref target='RFC9293'/> and UDP <xref target='RFC0768'/> have benefited
 from this standard representation and access method across many diverse
 platforms. SCTP <xref target='RFC6458'/> has also created its own sockets
-API. Base on <xref target='RFC6458'/>, this document defines a method to
+API. Based on <xref target='RFC6458'/>, this document defines a method to
 map the existing sockets API for use with In-kernel QUIC, providing both
 a base for access to new features and compatibility so that most existing
 TCP applications can be migrated to QUIC with few (if any) changes.</t>
@@ -846,7 +846,7 @@ userspace:</t>
 </li>
 <li><t>QUIC_STREAM_SEND_STATE_RESET_SENT</t>
   <t>An update is delivered only if a STOP_SENDING frame is received from
-  the peer and a STREAM_RESET frame is trigger to send out. The
+  the peer and a STREAM_RESET frame is triggered to send out. The
   STOP_SENDING frame MAY be sent by the peer via the socket option
   STREAM_STOP_SENDING <xref target='sockopt_stream_stop_sending'/>.</t>
 </li>
@@ -1390,7 +1390,7 @@ are two methods to handle this interaction:</t>
   connecting or accepting kernel socket.</li>
   <li>This sockfd is then sent to userspace, where the userspace service
   performs the handshake as if it were handling a userspace socket.</li>
-  <li>Once the handshake is complete, the service sends the sockfd back to
+  <li>Once the handshake is completed, the service sends the sockfd back to
   the kernel. The Kernel then detaches the sockfd from the kernel socket, which
   is now in an established state.</li>
   </ul>
