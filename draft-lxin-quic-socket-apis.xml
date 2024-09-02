@@ -333,8 +333,8 @@ A pair of high-level APIs MAY be defined to wrap the handshake process
 in userspace. See <xref target='advanced_handshake'/>.</t>
 <t>Post Handshake, users SHOULD use sendmsg() and recvmsg() with Stream
 msg_control <xref target='struct_stream'/> to send data msgs to and
-receive from the kernel with stream_id and stream_flags. One pair of high
-level APIs MAY be defined to wrap Stream msg_control.
+receive from the kernel with stream_id and stream_flags. One pair of
+high-level APIs MAY be defined to wrap Stream msg_control.
 See <xref target='advanced_stream'/>.</t>
 </section>
 <section title='send(), recv(), read() and write()'>
