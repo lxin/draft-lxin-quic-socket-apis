@@ -131,7 +131,7 @@ lower-layer UDP socket MAY serve multiple QUIC sockets.</t>
 <section title='Basic Operation'>
 <section title='socket()'>
 <t>Applications use socket() to create a socket descriptor to represent
-an QUIC endpoint.</t>
+a QUIC endpoint.</t>
 <t>The function prototype is</t>
 <sourcecode type='language C'>
 int socket(int domain,
@@ -207,7 +207,7 @@ threads. The ALPNs for sockets are set via socket option ALPN
 <xref target='sockopt_alpn'/> before calling listen().</t>
 </section>
 <section title='accept()'>
-<t>Applications use the accept() call to remove an QUIC connection request
+<t>Applications use the accept() call to remove a QUIC connection request
 from the accept queue of the endpoint.  A new socket descriptor will be
 returned from accept() to represent the newly formed connection
 request.</t>
@@ -256,7 +256,7 @@ or struct sockaddr_in6 for an IPv6 address. See <xref target='RFC3542'/>).
 <t>connect() MUST be called before sending any handshake message.</t>
 </section>
 <section title='close()'>
-<t>Applications use close() to gracefully close down an connection.</t>
+<t>Applications use close() to gracefully close down a connection.</t>
 <t>The function prototype is</t>
 <sourcecode type='language C'>
 int close(int sd);
@@ -1393,10 +1393,10 @@ are two methods to handle this interaction:</t>
   now in an established state.</li>
   </ul>
 </li>
-<li><t>Sending Raw TLS Messages with an session ID:</t>
+<li><t>Sending Raw TLS Messages with a session ID:</t>
   <ul>
   <li>Kernel consumers send raw TLS messages to userspace, identified by
-  an session ID.</li>
+  a session ID.</li>
   <li>The userspace service creates a TLS session associated with this ID
   and exchanges TLS messages with the session.</li>
   <li>The service then sends the response TLS messages back to kernel. This
