@@ -171,7 +171,7 @@ or struct sockaddr_in6 for an IPv6 address. See <xref target='RFC3493'/>).
 <t>Applications cannot call bind() multiple times to associate multiple
 addresses with an endpoint. After the first bind() call, all subsequent
 calls will return an error. However, multiple applications MAY bind()
-to the same address and port, sharing the same lower UDP socket in
+to the same address and port, sharing the same lower UDP socket in the
 kernel.</t>
 <t>The IP address part of addr MAY be specified as a wildcard (e.g.,
 INADDR_ANY for IPv4 or IN6ADDR_ANY_INIT or in6addr_any for IPv6). An
@@ -199,11 +199,11 @@ int listen(int sd,
 listening.</li>
 </ul>
 <t>listen() returns 0 on success and -1 in case of an error.</t>
-<t>The implementation SHOULD allow kernel to parse the ALPN from a
+<t>The implementation SHOULD allow the kernel to parse the ALPN from a
 Client Initial packet and direct the incoming request based on it to
 different listening sockets (binding to the same address and port).
 These sockets could belong to different user processes or kernel
-threads. The ALPNs for sockets are set via socket option ALPN
+threads. The ALPNs for sockets are set via the socket option ALPN
 <xref target='sockopt_alpn'/> before calling listen().</t>
 </section>
 <section title='accept()'>
@@ -269,7 +269,7 @@ int close(int sd);
 <t>After an application calls close() on a socket descriptor, no further
 socket operations will succeed on that descriptor.</t>
 <t>close() will send a CLOSE frame to the peer. The close information MAY
-be set via socket option CONNECTION_CLOSE <xref target='sockopt_close'/>
+be set via the CONNECTION_CLOSE socket option <xref target='sockopt_close'/>
 before calling close().</t>
 </section>
 <section title='shutdown()'>
@@ -333,7 +333,7 @@ A pair of high-level APIs MAY be defined to wrap the handshake process
 in userspace. See <xref target='advanced_handshake'/>.</t>
 <t>Post Handshake, users SHOULD use sendmsg() and recvmsg() with Stream
 msg_control <xref target='struct_stream'/> to send data msgs to and
-receive from kernel with stream_id and stream_flags. One pair of high
+receive from the kernel with stream_id and stream_flags. One pair of high
 level APIs MAY be defined to wrap Stream msg_control.
 See <xref target='advanced_stream'/>.</t>
 </section>
@@ -550,12 +550,13 @@ msg_control <xref target='struct_handshake'/> to send and receive raw TLS
 messages between the kernel and userspace. These messages should be processed
 in userspace using a TLS library, such as GnuTLS.</t>
 </li>
-<li><t>Processing TLS QUIC Transport Parameters Extension:</t>
-<t>The implementation SHOULD retrieve local TLS QUIC transport parameters
-extension from the kernel using socket option
-TRANSPORT_PARAM_EXT <xref target='sockopt_transport_param_ext'/> for
+<li><t>Processing the TLS QUIC Transport Parameters Extension:</t>
+<t>The implementation SHOULD retrieve the local TLS QUIC transport parameters
+extension from the kernel using the TRANSPORT_PARAM_EXT socket option
+<xref target='sockopt_transport_param_ext'/> for
 building TLS messages. Additionally, remote handshake parameters should
-be set in kernel using the same socket option for constructing QUIC packets.</t>
+be set in the kernel using the same socket option for constructing QUIC
+packets.</t>
 </li>
 <li><t>Setting Secrets for Different Crypto Levels:</t>
 <t>The implementation SHOULD set secrets for various crypto levels using
@@ -614,8 +615,8 @@ data types are described in <xref target='control_struct'/>.</t>
   <li>MSG_DATAGRAM:  Sends data as an unreliable datagram.</li>
   </ul>
   <t>Additionally, the flags can also be set to the values in stream_flags
-  on send side <xref target='struct_stream'/> if Stream msg_control is not
-  being used. In this case, the most recently opened stream will be used
+  on the send side <xref target='struct_stream'/> if Stream msg_control is
+  not being used. In this case, the most recently opened stream will be used
   for sending data.</t>
 </li>
 <li><t>msg_flags of msghdr passed to the kernel is ignored.</t></li>
@@ -634,12 +635,12 @@ data types are described in <xref target='control_struct'/>.</t>
   <li>MSG_NOTIFICATION:  Indicates that the received data is a notification
   message.</li>
   <li>These flags might also be set to the values in
-  stream_flags on receive side <xref target='struct_stream'/> if Stream
+  stream_flags on the receive side <xref target='struct_stream'/> if Stream
   msg_control is not being used. In this case, the stream id for received
   data is invisible to user space.</li>
   </ul>
   <t>Additionally, the flags might also be set to the values in
-  stream_flags on receive side <xref target='struct_stream'/> if Stream
+  stream_flags on the receive side <xref target='struct_stream'/> if Stream
   msg_control is not being used. In this case, the stream ID for received
   data is not visible to users.</t>
 </li>
@@ -846,12 +847,12 @@ userspace:</t>
 <li><t>QUIC_STREAM_SEND_STATE_RESET_SENT</t>
   <t>An update is delivered only if a STOP_SENDING frame is received from
   the peer and a STREAM_RESET frame is trigger to send out. The
-  STOP_SENDING frame MAY be sent by the peer via socket option
+  STOP_SENDING frame MAY be sent by the peer via the socket option
   STREAM_STOP_SENDING <xref target='sockopt_stream_stop_sending'/>.</t>
 </li>
 <li><t>QUIC_STREAM_SEND_STATE_RESET_RECVD</t>
   <t>An update is delivered when a STREAM_RESET frame has been received and
-  acknowledged by the peer. The STREAM_RESET frame MAY be sent via socket
+  acknowledged by the peer. The STREAM_RESET frame MAY be sent via the socket
   option STREAM_RESET <xref target='sockopt_stream_reset'/>.</t>
 </li>
 <li><t>QUIC_STREAM_RECV_STATE_RECV</t>
@@ -888,7 +889,7 @@ struct quic_stream_update {
 <section title='QUIC_EVENT_STREAM_MAX_STREAM'>
 <t>This notification is delivered when a MAX_STREAMS frame is received. It
 is particularly useful when using MSG_STREAM_DONTWAIT stream_flags to open
-a stream via socket option STREAM_OPEN <xref target='sockopt_stream_open'/>
+a stream via the socket option STREAM_OPEN <xref target='sockopt_stream_open'/>
 whose ID exceeds the current maximum stream count. After receiving this
 notification, the application SHOULD attempt to open the stream again.</t>
 <t>Data format in the event</t>
@@ -898,7 +899,7 @@ uint64_t max_stream;
 </section>
 <section title='QUIC_EVENT_CONNECTION_CLOSE'>
 <t>This notification is delivered when a CLOSE frame is received from the
-peer. The peer MAY set the close information via socket option
+peer. The peer MAY set the close information via the socket option
 CONNECTION_CLOSE <xref target='sockopt_close'/> before calling close().</t>
 <t>Data format in the event</t>
 <sourcecode type='language C'>
@@ -925,7 +926,7 @@ uint8_t local_migration;
 </section>
 <section title='QUIC_EVENT_KEY_UPDATE'>
 <t>This notification is delivered when both sides have successfully updated
-to the new key phase after a key update via socket option KEY_UPDATE
+to the new key phase after a key update via the socket option KEY_UPDATE
 <xref target='sockopt_key_update'/> on either side. The parameter
 indicates which key phase is currently in use.</t>
 <t>Data format in the event</t>
@@ -1158,7 +1159,7 @@ on the client side or the server side.</t>
   <t>The optval type is null.</t>
 </li>
 </ul>
-<t>The default value in socket is null.</t>
+<t>The default value in the socket is null.</t>
 </section>
 <section title='QUIC_SOCKOPT_ALPN' anchor='sockopt_alpn'>
 <t>This option is used on listening sockets for kernel ALPN routing.
@@ -1166,10 +1167,10 @@ On regular sockets, it allows kernel consumers to communicate ALPN
 identifiers with userspace handshake.</t>
 <ul>
 <li><t>On regular sockets:</t>
-  <t>It sets the desired ALPNs before kernel consumers send handshake
-  requests to userspace. Multiple ALPNs can be specified, separated by
-  commas (e.g., "smbd,h3,ksmbd"). Userspace handshake SHOULD return the
-  selected ALPN to kernel via this socket option.</t>
+  <t>It sets the desired ALPNs before the kernel consumers send handshake
+  requests to userspace. Multiple ALPNs can be specified separated by
+  commas (e.g., "smbd,h3,ksmbd"). The userspace handshake SHOULD return the
+  selected ALPN to the kernel via this socket option.</t>
 </li>
 <li><t>On listening socket:</t>
   <t>If kernel supports ALPN routing, this feature directs incoming
@@ -1182,7 +1183,7 @@ identifiers with userspace handshake.</t>
 <sourcecode type='language C'>
 char *alpn;
 </sourcecode>
-<t>The default value in socket is null.</t>
+<t>The default value in the socket is null.</t>
 </section>
 <section title='QUIC_SOCKOPT_SESSION_TICKET'
   anchor='sockopt_session_ticket'>
@@ -1214,11 +1215,11 @@ userspace handshake.</t>
 <sourcecode type='language C'>
 uint8_t *opt;
 </sourcecode>
-<t>The default value in socket is null.</t>
+<t>The default value in the socket is null.</t>
 </section>
 <section title='QUIC_SOCKOPT_CRYPTO_SECRET' anchor='sockopt_crypto_secret'>
 <t>This socket option is used to set cryptographic secrets derived from
-userspace to the socket in kernel during the QUIC handshake process.</t>
+userspace to the socket in the kernel during the QUIC handshake process.</t>
 <t>The optval type is</t>
 <sourcecode type='language C'>
 struct quic_crypto_secret {
@@ -1268,11 +1269,11 @@ process.</t>
 <li><t>Get Operation:</t>
   <t>When retrieving parameters via getsockopt, this option generates the
   QUIC Transport Parameters Extension based on the local transport
-  parameters configured in kernel. The retrieved extension helps
+  parameters configured in the kernel. The retrieved extension helps
   userspace applications build the appropriate TLS messages.</t>
 </li>
 <li><t>Set Operation:</t>
-  <t>When setting parameters via setsockopt, this option updates kernel
+  <t>When setting parameters via setsockopt, this option updates the kernel
   with the QUIC Transport Parameters Extension received from the peer's
   TLS message. This ensures that the remote transport parameters are
   correctly configured in the kernel.</t>
@@ -1379,7 +1380,7 @@ for the QUIC connection.</t>
 <t>In-kernel QUIC is not only beneficial for userspace applications such
 as HTTP/3, but it also naturally supports kernel consumers like SMB and
 NFS. For these kernel consumers, a userspace service is needed to handle
-handshake requests from kernel. The communication between userspace
+handshake requests from the kernel. The communication between userspace
 and kernel can vary across different operating systems. Generally, there
 are two methods to handle this interaction:</t>
 <ul>
@@ -1390,8 +1391,8 @@ are two methods to handle this interaction:</t>
   <li>This sockfd is then sent to userspace, where the userspace service
   performs the handshake as if it were handling a userspace socket.</li>
   <li>Once the handshake is complete, the service sends the sockfd back to
-  kernel. Kernel then detaches the sockfd from kernel socket, which is
-  now in an established state.</li>
+  the kernel. The Kernel then detaches the sockfd from the kernel socket, which
+  is now in an established state.</li>
   </ul>
 </li>
 <li><t>Sending Raw TLS Messages with a session ID:</t>
@@ -1400,7 +1401,7 @@ are two methods to handle this interaction:</t>
   a session ID.</li>
   <li>The userspace service creates a TLS session associated with this ID
   and exchanges TLS messages with the session.</li>
-  <li>The service then sends the response TLS messages back to kernel. This
+  <li>The service then sends the response TLS messages back to the kernel. This
   method requires maintaining the TLS session identified by the ID in
   userspace until the handshake is complete after multiple exchanges.</li>
   </ul>
