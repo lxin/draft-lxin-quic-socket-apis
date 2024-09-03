@@ -6,6 +6,7 @@
 <meta content="initial-scale=1.0" name="viewport">
 <title>Sockets API Extensions for In-kernel QUIC Implementations</title>
 <meta content="Xin Long" name="author">
+<meta content="Moritz Buhl" name="author">
 <meta content="
        This document describes a mapping of In-kernel QUIC Implementations
 into a sockets API.  The benefits of this mapping include compatibility
@@ -33,7 +34,7 @@ both userspace applications and kernel consumers.
     wcwidth 0.2.13
     weasyprint 61.2
 -->
-<link href="/usr/src/app/tmp/9e21981d-adff-4cb4-bdf4-82dd42f4221c/draft-lxin-quic-socket-apis.xml" rel="alternate" type="application/rfc+xml">
+<link href="/usr/src/app/tmp/2c338b78-fcc4-4a85-8d34-fde0a20b495b/draft-lxin-quic-socket-apis.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
 <style type="text/css">/*
 
@@ -1219,8 +1220,8 @@ li > p:last-of-type:only-child {
 <td class="right">September 2024</td>
 </tr></thead>
 <tfoot><tr>
-<td class="left">Xin</td>
-<td class="center">Expires 5 March 2025</td>
+<td class="left">Xin &amp; Buhl</td>
+<td class="center">Expires 7 March 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1233,18 +1234,23 @@ li > p:last-of-type:only-child {
 <dd class="internet-draft">draft-lxin-quic-socket-apis-00</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-09-01" class="published">1 September 2024</time>
+<time datetime="2024-09-03" class="published">3 September 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-03-05">5 March 2025</time></dd>
-<dt class="label-authors">Author:</dt>
+<dd class="expires"><time datetime="2025-03-07">7 March 2025</time></dd>
+<dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
       <div class="author-name">L. Xin, <span class="editor">Ed.</span>
 </div>
 <div class="org">Red Hat</div>
+</div>
+<div class="author">
+      <div class="author-name">M. Buhl, <span class="editor">Ed.</span>
+</div>
+<div class="org">Technical University of Munich</div>
 </div>
 </dd>
 </dl>
@@ -1277,7 +1283,7 @@ both userspace applications and kernel consumers.<a href="#section-abstract-1" c
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 5 March 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 7 March 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1541,7 +1547,7 @@ both userspace applications and kernel consumers.<a href="#section-abstract-1" c
             <p id="section-toc.1-1.14.1"><a href="#appendix-D" class="auto internal xref">Appendix D</a>.  <a href="#name-example-for-kernel-consumer" class="internal xref">Example For Kernel Consumers Architecture Design</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
-            <p id="section-toc.1-1.15.1"><a href="#appendix-E" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+            <p id="section-toc.1-1.15.1"><a href="#appendix-E" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1556,7 +1562,7 @@ Protocol suite to many operating systems.  Both TCP
 <span>[<a href="#RFC9293" class="cite xref">RFC9293</a>]</span> and UDP <span>[<a href="#RFC0768" class="cite xref">RFC0768</a>]</span> have benefited
 from this standard representation and access method across many diverse
 platforms. SCTP <span>[<a href="#RFC6458" class="cite xref">RFC6458</a>]</span> has also created its own sockets
-API. Base on <span>[<a href="#RFC6458" class="cite xref">RFC6458</a>]</span>, this document defines a method to
+API. Based on <span>[<a href="#RFC6458" class="cite xref">RFC6458</a>]</span>, this document defines a method to
 map the existing sockets API for use with In-kernel QUIC, providing both
 a base for access to new features and compatibility so that most existing
 TCP applications can be migrated to QUIC with few (if any) changes.<a href="#section-1-1" class="pilcrow">¶</a></p>
@@ -1633,7 +1639,7 @@ lower-layer UDP socket MAY serve multiple QUIC sockets.<a href="#section-3-21" c
 <a href="#section-3.1.1" class="section-number selfRef">3.1.1. </a><a href="#name-socket" class="section-name selfRef">socket()</a>
           </h4>
 <p id="section-3.1.1-1">Applications use socket() to create a socket descriptor to represent
-an QUIC endpoint.<a href="#section-3.1.1-1" class="pilcrow">¶</a></p>
+a QUIC endpoint.<a href="#section-3.1.1-1" class="pilcrow">¶</a></p>
 <p id="section-3.1.1-2">The function prototype is<a href="#section-3.1.1-2" class="pilcrow">¶</a></p>
 <div class="C lang-language sourcecode" id="section-3.1.1-3">
 <pre>
@@ -1651,7 +1657,7 @@ implementation.<a href="#section-3.1.1-5" class="pilcrow">¶</a></p>
 <p id="section-3.1.1-6">The function returns a socket descriptor or -1 in case of an error.
 Using the PF_INET domain indicates the creation of an endpoint that MUST
 use only IPv4 addresses, while PF_INET6 creates an endpoint that MAY use
-both IPv6 and IPv4 addresses.<a href="#section-3.1.1-6" class="pilcrow">¶</a></p>
+both IPv6 and IPv4 addresses. See <span><a href="https://rfc-editor.org/rfc/rfc3493#section-3.7" class="relref">Section 3.7</a> of [<a href="#RFC3493" class="cite xref">RFC3493</a>]</span>.<a href="#section-3.1.1-6" class="pilcrow">¶</a></p>
 </section>
 <section id="section-3.1.2">
           <h4 id="name-bind">
@@ -1681,7 +1687,7 @@ or struct sockaddr_in6 for an IPv6 address. See <span>[<a href="#RFC3493" class=
 <p id="section-3.1.2-7">Applications cannot call bind() multiple times to associate multiple
 addresses with an endpoint. After the first bind() call, all subsequent
 calls will return an error. However, multiple applications MAY bind()
-to the same address and port, sharing the same lower UDP socket in
+to the same address and port, sharing the same lower UDP socket in the
 kernel.<a href="#section-3.1.2-7" class="pilcrow">¶</a></p>
 <p id="section-3.1.2-8">The IP address part of addr MAY be specified as a wildcard (e.g.,
 INADDR_ANY for IPv4 or IN6ADDR_ANY_INIT or in6addr_any for IPv6). An
@@ -1716,18 +1722,18 @@ listening.<a href="#section-3.1.3-5.2" class="pilcrow">¶</a>
 </li>
           </ul>
 <p id="section-3.1.3-6">listen() returns 0 on success and -1 in case of an error.<a href="#section-3.1.3-6" class="pilcrow">¶</a></p>
-<p id="section-3.1.3-7">The implementation SHOULD allow kernel to parse the ALPN from a
+<p id="section-3.1.3-7">The implementation SHOULD allow the kernel to parse the ALPN from a
 Client Initial packet and direct the incoming request based on it to
 different listening sockets (binding to the same address and port).
 These sockets could belong to different user processes or kernel
-threads. The ALPNs for sockets are set via socket option ALPN
+threads. The ALPNs for sockets are set via the ALPN socket option
 <a href="#sockopt_alpn" class="auto internal xref">Section 6.1.6</a> before calling listen().<a href="#section-3.1.3-7" class="pilcrow">¶</a></p>
 </section>
 <section id="section-3.1.4">
           <h4 id="name-accept">
 <a href="#section-3.1.4" class="section-number selfRef">3.1.4. </a><a href="#name-accept" class="section-name selfRef">accept()</a>
           </h4>
-<p id="section-3.1.4-1">Applications use the accept() call to remove an QUIC connection request
+<p id="section-3.1.4-1">Applications use the accept() call to remove a QUIC connection request
 from the accept queue of the endpoint.  A new socket descriptor will be
 returned from accept() to represent the newly formed connection
 request.<a href="#section-3.1.4-1" class="pilcrow">¶</a></p>
@@ -1790,7 +1796,7 @@ or struct sockaddr_in6 for an IPv6 address. See <span>[<a href="#RFC3542" class=
           <h4 id="name-close">
 <a href="#section-3.1.6" class="section-number selfRef">3.1.6. </a><a href="#name-close" class="section-name selfRef">close()</a>
           </h4>
-<p id="section-3.1.6-1">Applications use close() to gracefully close down an connection.<a href="#section-3.1.6-1" class="pilcrow">¶</a></p>
+<p id="section-3.1.6-1">Applications use close() to gracefully close down a connection.<a href="#section-3.1.6-1" class="pilcrow">¶</a></p>
 <p id="section-3.1.6-2">The function prototype is<a href="#section-3.1.6-2" class="pilcrow">¶</a></p>
 <div class="C lang-language sourcecode" id="section-3.1.6-3">
 <pre>
@@ -1805,8 +1811,8 @@ int close(int sd);
 <p id="section-3.1.6-6">close() returns 0 on success and -1 in case of an error.<a href="#section-3.1.6-6" class="pilcrow">¶</a></p>
 <p id="section-3.1.6-7">After an application calls close() on a socket descriptor, no further
 socket operations will succeed on that descriptor.<a href="#section-3.1.6-7" class="pilcrow">¶</a></p>
-<p id="section-3.1.6-8">close() will send CLOSE frame to the peer, the close information MAY
-be set via socket option CONNECTION_CLOSE <a href="#sockopt_close" class="auto internal xref">Section 6.1.2</a>
+<p id="section-3.1.6-8">close() will send a CLOSE frame to the peer. The close information MAY
+be set via the CONNECTION_CLOSE socket option <a href="#sockopt_close" class="auto internal xref">Section 6.1.2</a>
 before calling close().<a href="#section-3.1.6-8" class="pilcrow">¶</a></p>
 </section>
 <section id="section-3.1.7">
@@ -1832,7 +1838,7 @@ int shutdown(int sd,
 <li class="normal" id="section-3.1.7-5.2.2.1">SHUT_RD: Disables further receive operations, the socket state is
   set to closed.<a href="#section-3.1.7-5.2.2.1" class="pilcrow">¶</a>
 </li>
-                <li class="normal" id="section-3.1.7-5.2.2.2">SHUT_WR: Disables further send operations, after sending CLOSE frame,
+                <li class="normal" id="section-3.1.7-5.2.2.2">SHUT_WR: Disables further send operations. After sending a CLOSE frame,
   the socket state is set to closed.<a href="#section-3.1.7-5.2.2.2" class="pilcrow">¶</a>
 </li>
                 <li class="normal" id="section-3.1.7-5.2.2.3">SHUT_RDWR: Similar to SHUT_WR.<a href="#section-3.1.7-5.2.2.3" class="pilcrow">¶</a>
@@ -1882,14 +1888,14 @@ case of an error.  recvmsg() returns the number of bytes received or
 data MAY be sent and received along with user data.<a href="#section-3.1.8-7" class="pilcrow">¶</a></p>
 <p id="section-3.1.8-8">During Handshake, users SHOULD use sendmsg() and recvmsg() with
 Handshake msg_control <a href="#struct_handshake" class="auto internal xref">Section 4.3.2</a> to send raw TLS
-messages to and receive from kernel, and to exchange TLS messages in
+messages to and receive from the kernel and to exchange TLS messages in
 userspace with the help of a third-party TLS library, such as GnuTLS.
 A pair of high-level APIs MAY be defined to wrap the handshake process
 in userspace. See <a href="#advanced_handshake" class="auto internal xref">Section 3.2.2</a>.<a href="#section-3.1.8-8" class="pilcrow">¶</a></p>
 <p id="section-3.1.8-9">Post Handshake, users SHOULD use sendmsg() and recvmsg() with Stream
 msg_control <a href="#struct_stream" class="auto internal xref">Section 4.3.1</a> to send data msgs to and
-receive from kernel with stream_id and stream_flags. One pair of high
-level APIs MAY be defined to wrap Stream msg_control.
+receive from the kernel with stream_id and stream_flags. One pair of
+high-level APIs MAY be defined to wrap Stream msg_control.
 See <a href="#advanced_stream" class="auto internal xref">Section 3.2.1</a>.<a href="#section-3.1.8-9" class="pilcrow">¶</a></p>
 </section>
 <section id="section-3.1.9">
@@ -1926,8 +1932,8 @@ ssize_t recv(int sd,
 case of an error.  recv() returns the number of bytes received or
 -1 in case of an error.<a href="#section-3.1.9-6" class="pilcrow">¶</a></p>
 <p id="section-3.1.9-7">As the ancillary data (msg_control field) cannot be used, the flags will
-operate as described in <a href="#struct_msghdr" class="auto internal xref">Section 4.1</a>, but without the
-context provided by Stream msg_control. This means that while sending, the
+operate as described in <a href="#struct_msghdr" class="auto internal xref">Section 4.1</a> but without the
+context provided by Stream msg_control. This means that while sending the
 flags function as intended, but during receiving, users won't be able to
 receive any flags from the kernel, making it impossible to determine the
 end of the stream data.<a href="#section-3.1.9-7" class="pilcrow">¶</a></p>
@@ -1985,7 +1991,7 @@ returned).<a href="#section-3.1.10-5.5" class="pilcrow">¶</a>
 <p id="section-3.1.11-1">Applications use getsockname() to retrieve the locally bound socket
 address of the specified socket and use getpeername() to retrieve the
 peer socket address. These functions are particularly useful when
-connection migration occurs and the corresponding event notifications
+connection migration occurs, and the corresponding event notifications
 are not enabled.<a href="#section-3.1.11-1" class="pilcrow">¶</a></p>
 <p id="section-3.1.11-2">The function prototypes are<a href="#section-3.1.11-2" class="pilcrow">¶</a></p>
 <div class="C lang-language sourcecode" id="section-3.1.11-3">
@@ -2081,7 +2087,7 @@ msg_flags/flags in <a href="#struct_msghdr" class="auto internal xref">Section 4
 <p id="section-3.2.1-11">quic_recvmsg() returns the number of bytes received or -1 in case of
 an error.<a href="#section-3.2.1-11" class="pilcrow">¶</a></p>
 <p id="section-3.2.1-12">These two functions wrap the sendmsg() and recvmsg() with Stream
-information msg_control, and are important for using QUIC multiple
+information msg_control and are important for using QUIC multiple
 streams. See an example in <a href="#example_stream" class="auto internal xref">Appendix A</a><a href="#section-3.2.1-12" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2172,21 +2178,22 @@ between kernel and userspace when implement quic_handshake():<a href="#section-3
               <p id="section-3.2.3-9.1.1">Handling Raw TLS Messages:<a href="#section-3.2.3-9.1.1" class="pilcrow">¶</a></p>
 <p id="section-3.2.3-9.1.2">The implementation SHOULD utilize sendmsg() and recvmsg() with Handshake
 msg_control <a href="#struct_handshake" class="auto internal xref">Section 4.3.2</a> to send and receive raw TLS
-messages between kernel and userspace. These messages should be processed
+messages between the kernel and userspace. These messages should be processed
 in userspace using a TLS library, such as GnuTLS.<a href="#section-3.2.3-9.1.2" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.2.3-9.2">
-              <p id="section-3.2.3-9.2.1">Processing TLS QUIC Transport Parameters Extension:<a href="#section-3.2.3-9.2.1" class="pilcrow">¶</a></p>
-<p id="section-3.2.3-9.2.2">The implementation SHOULD retrieve local TLS QUIC transport parameters
-extension from the kernel using socket option
-TRANSPORT_PARAM_EXT <a href="#sockopt_transport_param_ext" class="auto internal xref">Section 6.1.9</a> for
+              <p id="section-3.2.3-9.2.1">Processing the TLS QUIC Transport Parameters Extension:<a href="#section-3.2.3-9.2.1" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-9.2.2">The implementation SHOULD retrieve the local TLS QUIC transport parameters
+extension from the kernel using the TRANSPORT_PARAM_EXT socket option
+<a href="#sockopt_transport_param_ext" class="auto internal xref">Section 6.1.9</a> for
 building TLS messages. Additionally, remote handshake parameters should
-be set in kernel using the same socket option for constructing QUIC packets.<a href="#section-3.2.3-9.2.2" class="pilcrow">¶</a></p>
+be set in the kernel using the same socket option for constructing QUIC
+packets.<a href="#section-3.2.3-9.2.2" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.2.3-9.3">
               <p id="section-3.2.3-9.3.1">Setting Secrets for Different Crypto Levels:<a href="#section-3.2.3-9.3.1" class="pilcrow">¶</a></p>
 <p id="section-3.2.3-9.3.2">The implementation SHOULD set secrets for various crypto levels using
-socket option CRYPTO_SECRET <a href="#sockopt_crypto_secret" class="auto internal xref">Section 6.1.8</a>.<a href="#section-3.2.3-9.3.2" class="pilcrow">¶</a></p>
+the CRYPTO_SECRET socket option <a href="#sockopt_crypto_secret" class="auto internal xref">Section 6.1.8</a>.<a href="#section-3.2.3-9.3.2" class="pilcrow">¶</a></p>
 </li>
           </ul>
 </section>
@@ -2254,8 +2261,8 @@ data types are described in <a href="#control_struct" class="auto internal xref"
 </li>
             </ul>
 <p id="section-4.1-8.1.3">Additionally, the flags can also be set to the values in stream_flags
-  on send side <a href="#struct_stream" class="auto internal xref">Section 4.3.1</a> if Stream msg_control is not
-  being used. In this case, the most recently opened stream will be used
+  on the send side <a href="#struct_stream" class="auto internal xref">Section 4.3.1</a> if Stream msg_control is
+  not being used. In this case, the most recently opened stream will be used
   for sending data.<a href="#section-4.1-8.1.3" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-4.1-8.2">
@@ -2281,13 +2288,13 @@ data types are described in <a href="#control_struct" class="auto internal xref"
   message.<a href="#section-4.1-10.2.2.2" class="pilcrow">¶</a>
 </li>
               <li class="normal" id="section-4.1-10.2.2.3">These flags might also be set to the values in
-  stream_flags on receive side <a href="#struct_stream" class="auto internal xref">Section 4.3.1</a> if Stream
+  stream_flags on the receive side <a href="#struct_stream" class="auto internal xref">Section 4.3.1</a> if Stream
   msg_control is not being used. In this case, the stream id for received
   data is invisible to user space.<a href="#section-4.1-10.2.2.3" class="pilcrow">¶</a>
 </li>
             </ul>
 <p id="section-4.1-10.2.3">Additionally, the flags might also be set to the values in
-  stream_flags on receive side <a href="#struct_stream" class="auto internal xref">Section 4.3.1</a> if Stream
+  stream_flags on the receive side <a href="#struct_stream" class="auto internal xref">Section 4.3.1</a> if Stream
   msg_control is not being used. In this case, the stream ID for received
   data is not visible to users.<a href="#section-4.1-10.2.3" class="pilcrow">¶</a></p>
 </li>
@@ -2324,7 +2331,7 @@ respectively<a href="#section-4.2.2-1" class="pilcrow">¶</a></p>
 <p id="section-4.2.2-2">Implementations MAY have different padding requirements for ancillary
 data, so portable applications SHOULD make use of the macros
 CMSG_FIRSTHDR, CMSG_NXTHDR, CMSG_DATA, CMSG_SPACE, and CMSG_LEN.  See
-<span>[<a href="#RFC3542" class="cite xref">RFC3542</a>]</span> for more information. The following is an example,
+<span>[<a href="#RFC3542" class="cite xref">RFC3542</a>]</span> for more information. The following is an example
 from <span>[<a href="#RFC3542" class="cite xref">RFC3542</a>]</span>, demonstrating the use of these macros to
 access ancillary data<a href="#section-4.2.2-2" class="pilcrow">¶</a></p>
 <div class="C lang-language sourcecode" id="section-4.2.2-3">
@@ -2361,11 +2368,11 @@ ancillary data will often be fundamental to the correct and sane
 operation of the sockets application. For example, if an application
 needs to send and receive data on different QUIC streams, QUIC_STREAM_INFO
 ancillary data is indispensable.<a href="#section-4.2.3-1" class="pilcrow">¶</a></p>
-<p id="section-4.2.3-2">Given that some ancillary data is critical, and that multiple
+<p id="section-4.2.3-2">Given that some ancillary data is critical and that multiple
 ancillary data items MAY appear in any order, applications SHOULD be
 carefully written to always provide a large enough buffer to contain
 all possible ancillary data that can be presented by recvmsg().  If
-the buffer is too small, and crucial data is truncated, it MAY pose a
+the buffer is too small and crucial data is truncated, it MAY pose a
 fatal error condition.<a href="#section-4.2.3-2" class="pilcrow">¶</a></p>
 <p id="section-4.2.3-3">Thus, it is essential that applications be able to deterministically
 calculate the maximum required buffer size to pass to recvmsg().  One
@@ -2530,13 +2537,13 @@ enum quic_event_type {
 </pre><a href="#section-5-2" class="pilcrow">¶</a>
 </div>
 <p id="section-5-3">When a notification arrives, recvmsg() returns the notification in the
-application-supplied data buffer via msg_iov, and sets MSG_NOTIFICATION
+application-supplied data buffer via msg_iov and sets MSG_NOTIFICATION
 in msg_flags of msghdr in <a href="#struct_stream" class="auto internal xref">Section 4.3.1</a>.<a href="#section-5-3" class="pilcrow">¶</a></p>
 <p id="section-5-4">The first byte of the received data indicates the type of the event,
 corresponding to one of the values in the quic_event_type enum. The
 subsequent bytes contain the content of the event, meaning the length of
 the content is the total data length minus one byte. To manage and enable
-these events, refer to socket option EVENT
+these events, refer to the EVENT socket option
 <a href="#sockopt_event" class="auto internal xref">Section 5.2.1</a>.<a href="#section-5-4" class="pilcrow">¶</a></p>
 <div id="notification">
 <section id="section-5.1">
@@ -2559,14 +2566,14 @@ userspace:<a href="#section-5.1.1-1" class="pilcrow">¶</a></p>
             <li class="normal" id="section-5.1.1-2.2">
               <p id="section-5.1.1-2.2.1">QUIC_STREAM_SEND_STATE_RESET_SENT<a href="#section-5.1.1-2.2.1" class="pilcrow">¶</a></p>
 <p id="section-5.1.1-2.2.2">An update is delivered only if a STOP_SENDING frame is received from
-  the peer and a STREAM_RESET frame is trigger to send out. The
-  STOP_SENDING frame MAY be sent by the peer via socket option
-  STREAM_STOP_SENDING <a href="#sockopt_stream_stop_sending" class="auto internal xref">Section 6.3.2</a>.<a href="#section-5.1.1-2.2.2" class="pilcrow">¶</a></p>
+  the peer and a STREAM_RESET frame is triggered to send out. The
+  STOP_SENDING frame MAY be sent by the peer via the STREAM_STOP_SENDING
+  socket option <a href="#sockopt_stream_stop_sending" class="auto internal xref">Section 6.3.2</a>.<a href="#section-5.1.1-2.2.2" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-5.1.1-2.3">
               <p id="section-5.1.1-2.3.1">QUIC_STREAM_SEND_STATE_RESET_RECVD<a href="#section-5.1.1-2.3.1" class="pilcrow">¶</a></p>
 <p id="section-5.1.1-2.3.2">An update is delivered when a STREAM_RESET frame has been received and
-  acknowledged by the peer. The STREAM_RESET frame MAY be sent via socket
+  acknowledged by the peer. The STREAM_RESET frame MAY be sent via the socket
   option STREAM_RESET <a href="#sockopt_stream_reset" class="auto internal xref">Section 6.3.1</a>.<a href="#section-5.1.1-2.3.2" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-5.1.1-2.4">
@@ -2612,7 +2619,7 @@ struct quic_stream_update {
           </h4>
 <p id="section-5.1.2-1">This notification is delivered when a MAX_STREAMS frame is received. It
 is particularly useful when using MSG_STREAM_DONTWAIT stream_flags to open
-a stream via socket option STREAM_OPEN <a href="#sockopt_stream_open" class="auto internal xref">Section 6.2.1</a>
+a stream via the STREAM_OPEN socket option <a href="#sockopt_stream_open" class="auto internal xref">Section 6.2.1</a>
 whose ID exceeds the current maximum stream count. After receiving this
 notification, the application SHOULD attempt to open the stream again.<a href="#section-5.1.2-1" class="pilcrow">¶</a></p>
 <p id="section-5.1.2-2">Data format in the event<a href="#section-5.1.2-2" class="pilcrow">¶</a></p>
@@ -2627,8 +2634,8 @@ uint64_t max_stream;
 <a href="#section-5.1.3" class="section-number selfRef">5.1.3. </a><a href="#name-quic_event_connection_close" class="section-name selfRef">QUIC_EVENT_CONNECTION_CLOSE</a>
           </h4>
 <p id="section-5.1.3-1">This notification is delivered when a CLOSE frame is received from the
-peer. The peer MAY set the close information via socket option
-CONNECTION_CLOSE <a href="#sockopt_close" class="auto internal xref">Section 6.1.2</a> before calling close().<a href="#section-5.1.3-1" class="pilcrow">¶</a></p>
+peer. The peer MAY set the close information via the CONNECTION_CLOSE socket
+option <a href="#sockopt_close" class="auto internal xref">Section 6.1.2</a> before calling close().<a href="#section-5.1.3-1" class="pilcrow">¶</a></p>
 <p id="section-5.1.3-2">Data format in the event<a href="#section-5.1.3-2" class="pilcrow">¶</a></p>
 <div class="C lang-language sourcecode" id="section-5.1.3-3">
 <pre>
@@ -2645,7 +2652,7 @@ struct quic_connection_close {
 <a href="#section-5.1.4" class="section-number selfRef">5.1.4. </a><a href="#name-quic_event_connection_migra" class="section-name selfRef">QUIC_EVENT_CONNECTION_MIGRATION</a>
           </h4>
 <p id="section-5.1.4-1">This notification is delivered when either side successfully changes its
-source address using the socket option CONNECTION_MIGRATION
+source address using the CONNECTION_MIGRATION socket option
 <a href="#sockopt_migration" class="auto internal xref">Section 6.3.3</a>, or when the destination address is
 changed by the peer's connection migration. The notification includes a
 parameter indicating whether the migration was local or initiated by the
@@ -2664,7 +2671,7 @@ uint8_t local_migration;
 <a href="#section-5.1.5" class="section-number selfRef">5.1.5. </a><a href="#name-quic_event_key_update" class="section-name selfRef">QUIC_EVENT_KEY_UPDATE</a>
           </h4>
 <p id="section-5.1.5-1">This notification is delivered when both sides have successfully updated
-to the new key phase after a key update via socket option KEY_UPDATE
+to the new key phase after a key update via the KEY_UPDATE socket option
 <a href="#sockopt_key_update" class="auto internal xref">Section 6.3.4</a> on either side. The parameter
 indicates which key phase is currently in use.<a href="#section-5.1.5-1" class="pilcrow">¶</a></p>
 <p id="section-5.1.5-2">Data format in the event<a href="#section-5.1.5-2" class="pilcrow">¶</a></p>
@@ -2681,7 +2688,7 @@ uint8_t key_update_phase;
           </h4>
 <p id="section-5.1.6-1">This notification is delivered whenever a NEW_TOKEN frame is received
 from the peer. Since the handshake occurs in userspace, you can send these
-tokens using socket option TOKEN <a href="#sockopt_new_token" class="auto internal xref">Section 6.1.5</a>.<a href="#section-5.1.6-1" class="pilcrow">¶</a></p>
+tokens using the TOKEN socket option <a href="#sockopt_new_token" class="auto internal xref">Section 6.1.5</a>.<a href="#section-5.1.6-1" class="pilcrow">¶</a></p>
 <p id="section-5.1.6-2">Data format in the event<a href="#section-5.1.6-2" class="pilcrow">¶</a></p>
 <div class="C lang-language sourcecode" id="section-5.1.6-3">
 <pre>
@@ -2763,10 +2770,10 @@ to <a href="#sockopt_event" class="auto internal xref">Section 5.2.1</a>.<a href
           <h4 id="name-quic_sockopt_connection_clo">
 <a href="#section-6.1.2" class="section-number selfRef">6.1.2. </a><a href="#name-quic_sockopt_connection_clo" class="section-name selfRef">QUIC_SOCKOPT_CONNECTION_CLOSE</a>
           </h4>
-<p id="section-6.1.2-1">This option is used to get or get the close context, which includes
-errcode and phrase and frame. On close side, set it before calling close()
-to tell the peer the closing info, while on being closed side get it to
-show the peer closing info.<a href="#section-6.1.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.1.2-1">This option is used to get or set the close context, which includes
+errcode, phrase, and frame. On the closing side, set it before calling
+close() to tell the peer the closing information. On the side being closed,
+get it to receive the peer's closing information.<a href="#section-6.1.2-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.1.2-2.1">On the closing side: Set this option before calling close() to
 communicate the closing information to the peer.<a href="#section-6.1.2-2.1" class="pilcrow">¶</a>
@@ -2844,7 +2851,7 @@ and also includes some handshake-specific options for kernel consumers.<a href="
 <pre>
 struct quic_config {
   uint32_t    version;
-  uint32_t    plpmtud_probe_timeout;
+  uint32_t    plpmtud_probe_interval;
   uint64_t    initial_smoothed_rtt;
   uint8_t     congestion_control_algo;
   uint8_t     validate_peer_address;
@@ -2994,7 +3001,7 @@ on the client side or the server side.<a href="#section-6.1.5-1" class="pilcrow"
 <p id="section-6.1.5-2.2.3">The optval type is null.<a href="#section-6.1.5-2.2.3" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-6.1.5-3">The default value in socket is null.<a href="#section-6.1.5-3" class="pilcrow">¶</a></p>
+<p id="section-6.1.5-3">The default value in the socket is null.<a href="#section-6.1.5-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sockopt_alpn">
@@ -3008,10 +3015,10 @@ identifiers with userspace handshake.<a href="#section-6.1.6-1" class="pilcrow">
 <ul class="normal">
 <li class="normal" id="section-6.1.6-2.1">
               <p id="section-6.1.6-2.1.1">On regular sockets:<a href="#section-6.1.6-2.1.1" class="pilcrow">¶</a></p>
-<p id="section-6.1.6-2.1.2">It sets the desired ALPNs before kernel consumers send handshake
-  requests to userspace. Multiple ALPNs can be specified, separated by
-  commas (e.g., "smbd,h3,ksmbd"). Userspace handshake SHOULD return the
-  selected ALPN to kernel via this socket option.<a href="#section-6.1.6-2.1.2" class="pilcrow">¶</a></p>
+<p id="section-6.1.6-2.1.2">It sets the desired ALPNs before the kernel consumers send handshake
+  requests to userspace. Multiple ALPNs can be specified separated by
+  commas (e.g., "smbd,h3,ksmbd"). The userspace handshake SHOULD return the
+  selected ALPN to the kernel via this socket option.<a href="#section-6.1.6-2.1.2" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-6.1.6-2.2">
               <p id="section-6.1.6-2.2.1">On listening socket:<a href="#section-6.1.6-2.2.1" class="pilcrow">¶</a></p>
@@ -3027,7 +3034,7 @@ identifiers with userspace handshake.<a href="#section-6.1.6-1" class="pilcrow">
 char *alpn;
 </pre><a href="#section-6.1.6-4" class="pilcrow">¶</a>
 </div>
-<p id="section-6.1.6-5">The default value in socket is null.<a href="#section-6.1.6-5" class="pilcrow">¶</a></p>
+<p id="section-6.1.6-5">The default value in the socket is null.<a href="#section-6.1.6-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sockopt_session_ticket">
@@ -3042,11 +3049,12 @@ by client-side kernel consumers to communicate session data with
 userspace handshake.<a href="#section-6.1.7-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.1.7-2.1">
-              <p id="section-6.1.7-2.1.1">For userspace handshake:<a href="#section-6.1.7-2.1.1" class="pilcrow">¶</a></p>
-<p id="section-6.1.7-2.1.2">On server side, userspace handshake requires a key to enable
-  session ticket, this key SHOULD be retrieved via this socket option.<a href="#section-6.1.7-2.1.2" class="pilcrow">¶</a></p>
-<p id="section-6.1.7-2.1.3">On client side, userspace handshake can receive NEW_SESSION_TICKET
-  messages via this socket option from kernel to generate session data
+              <p id="section-6.1.7-2.1.1">For the userspace handshake:<a href="#section-6.1.7-2.1.1" class="pilcrow">¶</a></p>
+<p id="section-6.1.7-2.1.2">On the server side, a userspace handshake requires a key to enable
+  the session ticket option, this key SHOULD be retrieved via this socket
+  option.<a href="#section-6.1.7-2.1.2" class="pilcrow">¶</a></p>
+<p id="section-6.1.7-2.1.3">On the client side, a userspace handshake can receive NEW_SESSION_TICKET
+  messages via this socket option from the kernel to generate session data
   while processing this message.<a href="#section-6.1.7-2.1.3" class="pilcrow">¶</a></p>
 <p id="section-6.1.7-2.1.4">See an example in <a href="#example_early" class="auto internal xref">Appendix C</a>.<a href="#section-6.1.7-2.1.4" class="pilcrow">¶</a></p>
 </li>
@@ -3066,7 +3074,7 @@ userspace handshake.<a href="#section-6.1.7-1" class="pilcrow">¶</a></p>
 uint8_t *opt;
 </pre><a href="#section-6.1.7-4" class="pilcrow">¶</a>
 </div>
-<p id="section-6.1.7-5">The default value in socket is null.<a href="#section-6.1.7-5" class="pilcrow">¶</a></p>
+<p id="section-6.1.7-5">The default value in the socket is null.<a href="#section-6.1.7-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sockopt_crypto_secret">
@@ -3075,7 +3083,7 @@ uint8_t *opt;
 <a href="#section-6.1.8" class="section-number selfRef">6.1.8. </a><a href="#name-quic_sockopt_crypto_secret" class="section-name selfRef">QUIC_SOCKOPT_CRYPTO_SECRET</a>
           </h4>
 <p id="section-6.1.8-1">This socket option is used to set cryptographic secrets derived from
-userspace to the socket in kernel during the QUIC handshake process.<a href="#section-6.1.8-1" class="pilcrow">¶</a></p>
+userspace to the socket in the kernel during the QUIC handshake process.<a href="#section-6.1.8-1" class="pilcrow">¶</a></p>
 <p id="section-6.1.8-2">The optval type is<a href="#section-6.1.8-2" class="pilcrow">¶</a></p>
 <div class="C lang-language sourcecode" id="section-6.1.8-3">
 <pre>
@@ -3145,12 +3153,12 @@ process.<a href="#section-6.1.9-1" class="pilcrow">¶</a></p>
               <p id="section-6.1.9-2.1.1">Get Operation:<a href="#section-6.1.9-2.1.1" class="pilcrow">¶</a></p>
 <p id="section-6.1.9-2.1.2">When retrieving parameters via getsockopt, this option generates the
   QUIC Transport Parameters Extension based on the local transport
-  parameters configured in kernel. The retrieved extension helps
+  parameters configured in the kernel. The retrieved extension helps
   userspace applications build the appropriate TLS messages.<a href="#section-6.1.9-2.1.2" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-6.1.9-2.2">
               <p id="section-6.1.9-2.2.1">Set Operation:<a href="#section-6.1.9-2.2.1" class="pilcrow">¶</a></p>
-<p id="section-6.1.9-2.2.2">When setting parameters via setsockopt, this option updates kernel
+<p id="section-6.1.9-2.2.2">When setting parameters via setsockopt, this option updates the kernel
   with the QUIC Transport Parameters Extension received from the peer's
   TLS message. This ensures that the remote transport parameters are
   correctly configured in the kernel.<a href="#section-6.1.9-2.2.2" class="pilcrow">¶</a></p>
@@ -3307,7 +3315,7 @@ for the QUIC connection.<a href="#section-6.3.4-1" class="pilcrow">¶</a></p>
 <p id="section-7-1">In-kernel QUIC is not only beneficial for userspace applications such
 as HTTP/3, but it also naturally supports kernel consumers like SMB and
 NFS. For these kernel consumers, a userspace service is needed to handle
-handshake requests from kernel. The communication between userspace
+handshake requests from the kernel. The communication between userspace
 and kernel can vary across different operating systems. Generally, there
 are two methods to handle this interaction:<a href="#section-7-1" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -3320,22 +3328,22 @@ are two methods to handle this interaction:<a href="#section-7-1" class="pilcrow
             <li class="normal" id="section-7-2.1.2.2">This sockfd is then sent to userspace, where the userspace service
   performs the handshake as if it were handling a userspace socket.<a href="#section-7-2.1.2.2" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-7-2.1.2.3">Once the handshake is complete, the service sends the sockfd back to
-  kernel. Kernel then detaches the sockfd from kernel socket, which is
-  now in an established state.<a href="#section-7-2.1.2.3" class="pilcrow">¶</a>
+            <li class="normal" id="section-7-2.1.2.3">Once the handshake is completed, the service sends the sockfd back to
+  the kernel. The Kernel then detaches the sockfd from the kernel socket, which
+  is now in an established state.<a href="#section-7-2.1.2.3" class="pilcrow">¶</a>
 </li>
           </ul>
 </li>
         <li class="normal" id="section-7-2.2">
-          <p id="section-7-2.2.1">Sending Raw TLS Messages with an session ID:<a href="#section-7-2.2.1" class="pilcrow">¶</a></p>
+          <p id="section-7-2.2.1">Sending Raw TLS Messages with a session ID:<a href="#section-7-2.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-7-2.2.2.1">Kernel consumers send raw TLS messages to userspace, identified by
-  an session ID.<a href="#section-7-2.2.2.1" class="pilcrow">¶</a>
+  a session ID.<a href="#section-7-2.2.2.1" class="pilcrow">¶</a>
 </li>
             <li class="normal" id="section-7-2.2.2.2">The userspace service creates a TLS session associated with this ID
   and exchanges TLS messages with the session.<a href="#section-7-2.2.2.2" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-7-2.2.2.3">The service then sends the response TLS messages back to kernel. This
+            <li class="normal" id="section-7-2.2.2.3">The service then sends the response TLS messages back to the kernel. This
   method requires maintaining the TLS session identified by the ID in
   userspace until the handshake is complete after multiple exchanges.<a href="#section-7-2.2.2.3" class="pilcrow">¶</a>
 </li>
@@ -3350,7 +3358,7 @@ are two methods to handle this interaction:<a href="#section-7-1" class="pilcrow
       <h2 id="name-iana-considerations">
 <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-8-1">No actions from IANA required.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<p id="section-8-1">No actions from IANA are required.<a href="#section-8-1" class="pilcrow">¶</a></p>
 </section>
 <section id="section-9">
       <h2 id="name-security-considerations">
@@ -3362,7 +3370,7 @@ update the socket receive buffer whenever the local transport parameter
 max_data changes. Using a socket receive buffer smaller than the local
 transport parameter max_data MAY impair performance.<a href="#section-9-1" class="pilcrow">¶</a></p>
 <p id="section-9-2">Similarly, the socket send buffer SHOULD be adjusted based on the peer's
-max_data transport parameter to optimize performance, rather than setting
+max_data transport parameter to optimize performance rather than setting
 it manually.<a href="#section-9-2" class="pilcrow">¶</a></p>
 <p id="section-9-3">Additionally, the size of the optval for the following socket options
 SHOULD be limited to avoid excessive memory allocation:<a href="#section-9-3" class="pilcrow">¶</a></p>
@@ -3901,8 +3909,8 @@ err:
       <h2 id="name-example-for-session-consump">
 <a href="#appendix-C" class="section-number selfRef">Appendix C. </a><a href="#name-example-for-session-consump" class="section-name selfRef">Example For Session Consumption and 0-RTT transmission</a>
       </h2>
-<p id="appendix-C-1">This example illustrates how to use the socket options TOKEN,
-SESSION_TICKET, and TRANSPORT_PARAM to achieve session resumption
+<p id="appendix-C-1">This example illustrates how to use the TOKEN, SESSION_TICKET, and
+TRANSPORT_PARAM socket options to achieve session resumption
 and 0-RTT data transmission with QUIC (client_handshake() and
 server are from <a href="#example_early_handshake" class="auto internal xref">Appendix B</a>).<a href="#appendix-C-1" class="pilcrow">¶</a></p>
 <div class="C breakable lang-language sourcecode" id="appendix-C-2">
@@ -4257,8 +4265,8 @@ Kernel        │ │                  │ │                  │   │
 </div>
 <div id="authors-addresses">
 <section id="appendix-E">
-      <h2 id="name-authors-address">
-<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
       </h2>
 <address class="vcard">
         <div dir="auto" class="left"><span class="fn nameRole">Xin Long (<span class="role">editor</span>)</span></div>
@@ -4270,6 +4278,19 @@ Kernel        │ │                  │ │                  │   │
 <div class="email">
 <span>Email:</span>
 <a href="mailto:lucien.xin@gmail.com" class="email">lucien.xin@gmail.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Moritz Buhl (<span class="role">editor</span>)</span></div>
+<div dir="auto" class="left"><span class="org">Technical University of Munich</span></div>
+<div dir="auto" class="left"><span class="street-address">Boltzmannstrasse 3</span></div>
+<div dir="auto" class="left">
+<span class="postal-code">85748</span> <span class="locality">Garching</span>
+</div>
+<div dir="auto" class="left"><span class="country-name">Germany</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:ietf@moritzbuhl.de" class="email">ietf@moritzbuhl.de</a>
 </div>
 </address>
 </section>

@@ -1049,7 +1049,7 @@ and also includes some handshake-specific options for kernel consumers.</t>
 <sourcecode type='language C'>
 struct quic_config {
   uint32_t    version;
-  uint32_t    plpmtud_probe_timeout;
+  uint32_t    plpmtud_probe_interval;
   uint64_t    initial_smoothed_rtt;
   uint8_t     congestion_control_algo;
   uint8_t     validate_peer_address;
