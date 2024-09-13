@@ -41,6 +41,19 @@
     <email>ietf@moritzbuhl.de</email>
   </address>
 </author>
+<author fullname='Marcelo Ricardo Leitner' initials='M' role='editor'
+surname='Leitner'>
+  <organization>Red Hat</organization>
+  <address>
+    <postal>
+      <street>Av. Brg. Faria Lima, 3732</street>
+      <city>Sao Paolo</city>
+      <region>SP</region>
+      <country>BR</country>
+    </postal>
+    <email>mleitner@redhat.com</email>
+  </address>
+</author>
 
 <date year='2024'/>
 
@@ -174,11 +187,13 @@ calls will return an error. However, multiple applications MAY bind()
 to the same address and port, sharing the same lower UDP socket in the
 kernel.</t>
 <t>The IP address part of addr MAY be specified as a wildcard (e.g.,
-INADDR_ANY for IPv4 or IN6ADDR_ANY_INIT or in6addr_any for IPv6). An
-error will be returned if the IPv4 sin_port or IPv6 sin6_port is set
-to 0.</t>
-<t>If bind() is not called before connect() on the client, the system will
-automatically select an ephemeral port to bind during connect()..</t>
+INADDR_ANY for IPv4 or IN6ADDR_ANY_INIT or in6addr_any for IPv6). If the
+IPv4 sin_port or IPv6 sin6_port is set to 0, the operating system will
+choose an ephemeral port for the endpoint.</t>
+<t>If bind() is not explicitly called before connect() on the client, the
+system will automatically determine a valid source address based on the
+routing table and assign an ephemeral port to bind the socket during
+connect().</t>
 <t>Completing the bind() process does not permit the QUIC endpoint to
 accept inbound QUIC connection requests on the server. This capability
 is only enabled after a listen() system call, as described below,
@@ -205,6 +220,9 @@ different listening sockets (binding to the same address and port).
 These sockets could belong to different user processes or kernel
 threads. The ALPNs for sockets are set via the ALPN socket option
 <xref target='sockopt_alpn'/> before calling listen().</t>
+<t>If no ALPNs are configured before calling listen(), the listening
+socket will only be capable of accepting client connections that do
+not specify any ALPN.</t>
 </section>
 <section title='accept()'>
 <t>Applications use the accept() call to remove a QUIC connection request
@@ -285,10 +303,10 @@ int shutdown(int sd,
 <li>sd:  The socket descriptor of the connection to be closed.</li>
 <li><t>how:  Specifies the type of shutdown</t>
   <ul>
-  <li>SHUT_RD: Disables further receive operations, the socket state is
-  set to closed.</li>
-  <li>SHUT_WR: Disables further send operations. After sending a CLOSE frame,
-  the socket state is set to closed.</li>
+  <li>SHUT_RD: Disables further receive operations. All incoming data and
+  connection requests SHOULD be discard quietly.</li>
+  <li>SHUT_WR: Disables further send operations. It SHOULD send a CLOSE
+  frame.</li>
   <li>SHUT_RDWR: Similar to SHUT_WR.</li>
   </ul>
 </li>
@@ -323,6 +341,11 @@ msghdr structure.</li>
 <t>sendmsg() returns the number of bytes accepted by kernel or -1 in
 case of an error.  recvmsg() returns the number of bytes received or
 -1 in case of an error.</t>
+<t>If the application does not provide enough buffer space to completely
+receive a data message in recvmsg(), MSG_EOR will not be set in msg_flags.
+Successive reads will consume more of the same message until the entire
+message has been delivered, and MSG_EOR will be set. This is particularly
+useful for reading datagram and event messages.</t>
 <t>As described in <xref target='struct'/>, different types of ancillary
 data MAY be sent and received along with user data.</t>
 <t>During Handshake, users SHOULD use sendmsg() and recvmsg() with
@@ -361,15 +384,18 @@ ssize_t recv(int sd,
 <t>send() returns the number of bytes accepted by kernel or -1 in
 case of an error.  recv() returns the number of bytes received or
 -1 in case of an error.</t>
-<t>As the ancillary data (msg_control field) cannot be used, the flags will
-operate as described in <xref target='struct_msghdr'/> but without the
-context provided by Stream msg_control. This means that while sending the
-flags function as intended, but during receiving, users won't be able to
-receive any flags from the kernel, making it impossible to determine the
-end of the stream data.</t>
-<t>Both send() and recv() MUST NOT be used to transmit or receive TLS
-messages because, without ancillary data, Handshake Information cannot be
-carried.</t>
+<t>Since ancillary data (msg_control field) cannot be used, the flags will
+operate as described in <xref target='struct_msghdr'/>, but without the
+context provided by Stream or Handshake msg_control. While sending, the
+flags function as intended; however, when receiving, users will not be
+able to obtain any flags from the kernel.</t>
+<t>send() can transmit data as datagram messages when MSG_DATAGRAM is set
+in the flags, and as stream messages on the most recently opened stream
+if MSG_DATAGRAM is not set. However, it cannot send handshake messages.</t>
+<t>recv() can receive datagram, stream, or event messages, but it cannot
+determine the message type or stream ID without the appropriate flags and
+ancillary data from the kernel. It SHOULD return -1 with errno set to
+EINVAL when attempting to receive a handshake message.</t>
 <t>Alternatively, applications can use read() and write() to transmit and
 receive data to and from a peer. These functions are similar to recv() and
 send() but offer less functionality, as they do not allow the use of a
@@ -426,7 +452,7 @@ int getpeername(int sd,
 QUIC stack) is stored in this buffer.  If the socket is an IPv4 socket,
 the address will be IPv4.  If the socket is an IPv6 socket, the
 address will be either an IPv6 or IPv4 address.</li>
-<li>len:  The caller SHOULD set the length of the address here.  On
+<li>len:  The caller SHOULD set the length of the address buffer here.  On
 return, this is set to the length of the returned address.</li>
 </ul>
 <t>These functions return 0 on success and -1 in case of an error.</t>
@@ -456,7 +482,8 @@ ssize_t quic_sendmsg(int sd,
 <li>len:  The length of the message buffer.</li>
 <li>sid:  stream_id to point for sending.</li>
 <li>flags:  function as stream_flags in <xref target='struct_stream'/> and
-msg_flags/flags in <xref target='struct_msghdr'/>.</li>
+msg_flags/flags in <xref target='struct_msghdr'/>. Any unknown flags
+passed into the kernel MUST be rejected with an error returned.</li>
 </ul>
 <t>quic_sendmsg() returns the number of bytes accepted by kernel or -1
 in case of an error.</t>
@@ -476,7 +503,9 @@ ssize_t quic_recvmsg(int sd,
 <li>len:  The length of the message buffer.</li>
 <li>sid:  stream_id to point for receiving.</li>
 <li>flags:  function as stream_flags in <xref target='struct_stream'/> and
-msg_flags/flags in <xref target='struct_msghdr'/>.</li>
+msg_flags/flags in <xref target='struct_msghdr'/> used for passing flags
+to the kernel and then obtaining them from the kernel. Any unknown
+flags passed into the kernel MUST be rejected with an error returned.</li>
 </ul>
 <t>quic_recvmsg() returns the number of bytes received or -1 in case of
 an error.</t>
@@ -631,6 +660,7 @@ data types are described in <xref target='control_struct'/>.</t>
 </li>
 <li><t>msg_flags of msghdr returned from the kernel might be set to:</t>
   <ul>
+  <li>MSG_EOR: Indicates that the received data is read completely.</li>
   <li>MSG_DATAGRAM:  Indicates that the received data is a datagram.</li>
   <li>MSG_NOTIFICATION:  Indicates that the received data is a notification
   message.</li>
@@ -754,7 +784,7 @@ struct quic_stream_info {
     <li>Otherwise: Use the latest opened stream for sending data.</li>
     </ul>
   </li>
-  <li><t>!-1: The specified stream ID is used with the 1st 2 bits:</t>
+  <li><t>!-1: The specified stream ID is used with the first 2 bits:</t>
     <ul>
     <li>QUIC_STREAM_TYPE_SERVER_MASK(0x1): Indicates if it is a server-side
     stream.</li>
@@ -979,6 +1009,11 @@ struct quic_event_option {
 
 
 <section title='Socket Options' anchor='sockopt'>
+<t>The following subsection outlines various SOL_QUIC level socket options.
+A getsockopt() call MUST be used to retrieve any readable options, while
+a setsockopt() call MUST be used to configure any writable options. For
+further details on specific options and their corresponding structures,
+see the rest of this section.</t>
 <section title='Read/Write Options'>
 <section title='QUIC_SOCKOPT_EVENT'>
 <t>This socket option is used to set a specific notification option.
@@ -1577,6 +1612,7 @@ static int do_client(int argc, char *argv[])
            stream[sid >> 1].len, sid);
 
     memset(msg, 0, sizeof(msg));
+    flags = 0;
     ret = quic_recvmsg(sockfd, msg, sizeof(msg), &amp;sid, &amp;flags);
     if (ret == -1) {
         printf("recv error %d %d\n", ret, errno);
@@ -1633,6 +1669,7 @@ static int do_server(int argc, char *argv[])
 
     while (!(stream[0].flags &amp; MSG_STREAM_FIN) ||
            !(stream[1].flags &amp; MSG_STREAM_FIN)) {
+        flags = 0;
         ret = quic_recvmsg(sockfd, msg, sizeof(msg), &amp;sid, &amp;flags);
         if (ret == -1) {
             printf("recv error %d %d\n", ret, errno);
@@ -2005,7 +2042,7 @@ static int do_client(int argc, char *argv[])
            "token %d, save it\n", ticket_len, param_len, token_len);
 
     strcpy(msg, "hello quic server!");
-    sid = (0 | QUIC_STREAM_TYPE_UNI_MASK);
+    sid = 2;
     flags = MSG_STREAM_NEW | MSG_STREAM_FIN;
     ret = quic_sendmsg(sockfd, msg, strlen(msg), sid, flags);
     if (ret == -1) {
@@ -2070,7 +2107,7 @@ static int do_client(int argc, char *argv[])
 
     /* send early data before handshake */
     strcpy(msg, "hello quic server, I'm back!");
-    sid = (0 | QUIC_STREAM_TYPE_UNI_MASK);
+    sid = 2;
     flags = MSG_STREAM_NEW | MSG_STREAM_FIN;
     ret = quic_sendmsg(sockfd, msg, strlen(msg), sid, flags);
     if (ret == -1) {
@@ -2169,7 +2206,7 @@ static int do_server(int argc, char *argv[])
     printf("recv '%s' on stream %ld\n", msg, sid);
 
     strcpy(msg, "hello quic client!");
-    sid = (0 | QUIC_STREAM_TYPE_SERVER_MASK);
+    sid = 1;
     flags = MSG_STREAM_NEW | MSG_STREAM_FIN;
     ret = quic_sendmsg(sockfd, msg, strlen(msg), sid, flags);
     if (ret == -1) {
@@ -2203,7 +2240,7 @@ static int do_server(int argc, char *argv[])
     printf("recv '%s' on stream %ld\n", msg, sid);
 
     strcpy(msg, "hello quic client! welcome back!");
-    sid = (0 | QUIC_STREAM_TYPE_SERVER_MASK);
+    sid = 1;
     flags = MSG_STREAM_NEW | MSG_STREAM_FIN;
     ret = quic_sendmsg(sockfd, msg, strlen(msg), sid, flags);
     if (ret == -1) {
@@ -2257,7 +2294,7 @@ Kernel        │ │                  │ │                  │   │
 ├──────────────────────────────────────────┤   │   │netlink APIs │
 │ stream | connid | cong  | path  | timer  │   │   └─────────────┘
 ├──────────────────────────────────────────┤   │      │       │
-│  packet  |  frame  |  crypto  |  pnmap   │   │   ┌─────┐ ┌─────┐
+│  packet  |  frame  |  crypto  |  pnspace │   │   ┌─────┐ ┌─────┐
 ├──────────────────────────────────────────┤   │   │     │ │     │
 │        input       |       output        │   │───│ SMB │ │ NFS │...
 ├──────────────────────────────────────────┤   │   │     │ │     │
