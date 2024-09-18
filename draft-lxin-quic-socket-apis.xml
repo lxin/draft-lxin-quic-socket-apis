@@ -73,13 +73,36 @@ both userspace applications and kernel consumers.</t>
 
 <middle>
 <section title='Introduction'>
-<t>The sockets API has provided a standard mapping of the Internet
+<t>The QUIC protocol, as defined in <xref target='RFC9000'/>, offers a
+UDP-based, secure transport with flow-controlled streams for efficient
+communication, low-latency connection setup, and network path migration,
+ensuring confidentiality, integrity, and availability across various
+deployments.</t>
+<t>In-kernel QUIC implementations will be able to offer several key
+advantages:</t>
+<ul>
+<li>Seamless Integration for Kernel Subsystems: Kernel subsystems such as
+SMB and NFS can operate over QUIC seamlessly after the handshake,
+leveraging the netlink APIs.</li>
+<li>Efficient ALPN Routing: It incorporates ALPN routing within the kernel,
+efficiently directing incoming requests to the appropriate applications
+across different processes based on ALPN.</li>
+<li>Performance Enhancements: By minimizing data duplication through
+zero-copy techniques such as sendfile(), and paving the way for crypto
+offloading in NICs, this implementation enhances performance and prepares
+for future optimizations.</li>
+<li>Standardized Socket APIs for QUIC: It standardizes the socket APIs for
+QUIC, covering essential operations like listen(), accept(), connect(),
+sendmsg(), recvmsg(), close(), get/setsockopt() and
+getsock/peername().</li>
+</ul>
+<t>The socket APIs have provided a standard mapping of the Internet
 Protocol suite to many operating systems.  Both TCP
 <xref target='RFC9293'/> and UDP <xref target='RFC0768'/> have benefited
 from this standard representation and access method across many diverse
-platforms. SCTP <xref target='RFC6458'/> has also created its own sockets
-API. Based on <xref target='RFC6458'/>, this document defines a method to
-map the existing sockets API for use with In-kernel QUIC, providing both
+platforms. SCTP <xref target='RFC6458'/> has also created its own socket
+APIs. Based on <xref target='RFC6458'/>, this document defines a method to
+map the existing socket APIs for use with In-kernel QUIC, providing both
 a base for access to new features and compatibility so that most existing
 TCP applications can be migrated to QUIC with few (if any) changes.</t>
 <t>Some of the QUIC mechanisms cannot be adequately mapped to an
@@ -287,8 +310,8 @@ int close(int sd);
 <t>After an application calls close() on a socket descriptor, no further
 socket operations will succeed on that descriptor.</t>
 <t>close() will send a CLOSE frame to the peer. The close information MAY
-be set via the CONNECTION_CLOSE socket option <xref target='sockopt_close'/>
-before calling close().</t>
+be set via the CONNECTION_CLOSE socket option
+<xref target='sockopt_close'/> before calling close().</t>
 </section>
 <section title='shutdown()'>
 <t>QUIC differs from TCP in that it does not have half close
@@ -576,13 +599,13 @@ between kernel and userspace when implement quic_handshake():</t>
 <li><t>Handling Raw TLS Messages:</t>
 <t>The implementation SHOULD utilize sendmsg() and recvmsg() with Handshake
 msg_control <xref target='struct_handshake'/> to send and receive raw TLS
-messages between the kernel and userspace. These messages should be processed
-in userspace using a TLS library, such as GnuTLS.</t>
+messages between the kernel and userspace. These messages should be
+processed in userspace using a TLS library, such as GnuTLS.</t>
 </li>
 <li><t>Processing the TLS QUIC Transport Parameters Extension:</t>
-<t>The implementation SHOULD retrieve the local TLS QUIC transport parameters
-extension from the kernel using the TRANSPORT_PARAM_EXT socket option
-<xref target='sockopt_transport_param_ext'/> for
+<t>The implementation SHOULD retrieve the local TLS QUIC transport
+parameters extension from the kernel using the TRANSPORT_PARAM_EXT
+socket option <xref target='sockopt_transport_param_ext'/> for
 building TLS messages. Additionally, remote handshake parameters should
 be set in the kernel using the same socket option for constructing QUIC
 packets.</t>
@@ -645,8 +668,8 @@ data types are described in <xref target='control_struct'/>.</t>
   </ul>
   <t>Additionally, the flags can also be set to the values in stream_flags
   on the send side <xref target='struct_stream'/> if Stream msg_control is
-  not being used. In this case, the most recently opened stream will be used
-  for sending data.</t>
+  not being used. In this case, the most recently opened stream will be
+  used for sending data.</t>
 </li>
 <li><t>msg_flags of msghdr passed to the kernel is ignored.</t></li>
 </ul>
@@ -882,8 +905,8 @@ userspace:</t>
 </li>
 <li><t>QUIC_STREAM_SEND_STATE_RESET_RECVD</t>
   <t>An update is delivered when a STREAM_RESET frame has been received and
-  acknowledged by the peer. The STREAM_RESET frame MAY be sent via the socket
-  option STREAM_RESET <xref target='sockopt_stream_reset'/>.</t>
+  acknowledged by the peer. The STREAM_RESET frame MAY be sent via the
+  socket option STREAM_RESET <xref target='sockopt_stream_reset'/>.</t>
 </li>
 <li><t>QUIC_STREAM_RECV_STATE_RECV</t>
   <t>An update is delivered only when the last fragment of data has not
@@ -919,9 +942,10 @@ struct quic_stream_update {
 <section title='QUIC_EVENT_STREAM_MAX_STREAM'>
 <t>This notification is delivered when a MAX_STREAMS frame is received. It
 is particularly useful when using MSG_STREAM_DONTWAIT stream_flags to open
-a stream via the STREAM_OPEN socket option <xref target='sockopt_stream_open'/>
-whose ID exceeds the current maximum stream count. After receiving this
-notification, the application SHOULD attempt to open the stream again.</t>
+a stream via the STREAM_OPEN socket option
+<xref target='sockopt_stream_open'/> whose ID exceeds the current maximum
+stream count. After receiving this notification, the application SHOULD
+attempt to open the stream again.</t>
 <t>Data format in the event</t>
 <sourcecode type='language C'>
 uint64_t max_stream;
@@ -929,8 +953,8 @@ uint64_t max_stream;
 </section>
 <section title='QUIC_EVENT_CONNECTION_CLOSE'>
 <t>This notification is delivered when a CLOSE frame is received from the
-peer. The peer MAY set the close information via the CONNECTION_CLOSE socket
-option <xref target='sockopt_close'/> before calling close().</t>
+peer. The peer MAY set the close information via the CONNECTION_CLOSE
+socket option <xref target='sockopt_close'/> before calling close().</t>
 <t>Data format in the event</t>
 <sourcecode type='language C'>
 struct quic_connection_close {
@@ -967,7 +991,8 @@ uint8_t key_update_phase;
 <section title='QUIC_EVENT_NEW_TOKEN' anchor='event_new_token'>
 <t>This notification is delivered whenever a NEW_TOKEN frame is received
 from the peer. Since the handshake occurs in userspace, you can send these
-tokens using the TOKEN socket option <xref target='sockopt_new_token'/>.</t>
+tokens using the TOKEN socket option
+<xref target='sockopt_new_token'/>.</t>
 <t>Data format in the event</t>
 <sourcecode type='language C'>
 uint8_t *token;
@@ -1232,9 +1257,9 @@ userspace handshake.</t>
   <t>On the server side, a userspace handshake requires a key to enable
   the session ticket option, this key SHOULD be retrieved via this socket
   option.</t>
-  <t>On the client side, a userspace handshake can receive NEW_SESSION_TICKET
-  messages via this socket option from the kernel to generate session data
-  while processing this message.</t>
+  <t>On the client side, a userspace handshake can receive
+  NEW_SESSION_TICKET messages via this socket option from the kernel to
+  generate session data while processing this message.</t>
   <t>See an example in <xref target='example_early'/>.</t>
 </li>
 <li><t>For kernel consumers:</t>
@@ -1254,7 +1279,8 @@ uint8_t *opt;
 </section>
 <section title='QUIC_SOCKOPT_CRYPTO_SECRET' anchor='sockopt_crypto_secret'>
 <t>This socket option is used to set cryptographic secrets derived from
-userspace to the socket in the kernel during the QUIC handshake process.</t>
+userspace to the socket in the kernel during the QUIC handshake
+process.</t>
 <t>The optval type is</t>
 <sourcecode type='language C'>
 struct quic_crypto_secret {
@@ -1426,8 +1452,8 @@ are two methods to handle this interaction:</t>
   <li>This sockfd is then sent to userspace, where the userspace service
   performs the handshake as if it were handling a userspace socket.</li>
   <li>Once the handshake is completed, the service sends the sockfd back to
-  the kernel. The Kernel then detaches the sockfd from the kernel socket, which
-  is now in an established state.</li>
+  the kernel. The Kernel then detaches the sockfd from the kernel socket,
+  which is now in an established state.</li>
   </ul>
 </li>
 <li><t>Sending Raw TLS Messages with a session ID:</t>
@@ -1436,8 +1462,8 @@ are two methods to handle this interaction:</t>
   a session ID.</li>
   <li>The userspace service creates a TLS session associated with this ID
   and exchanges TLS messages with the session.</li>
-  <li>The service then sends the response TLS messages back to the kernel. This
-  method requires maintaining the TLS session identified by the ID in
+  <li>The service then sends the response TLS messages back to the kernel.
+  This method requires maintaining the TLS session identified by the ID in
   userspace until the handshake is complete after multiple exchanges.</li>
   </ul>
 </li>
