@@ -938,6 +938,13 @@ struct quic_stream_update {
   uint64_t finalsz;
 };
 </sourcecode>
+<t>id: The stream ID.</t>
+<t>state: The new stream state. All valid states are listed above.</t>
+<t>errcode: Error code for the application protocol. It is used for the
+RESET_SENT or RESET_RECVD state update on send side, and for the
+RESET_RECVD update on receive side.</t>
+<t>finalsz: The final size of the stream. It is used for the SIZE_KNOWN,
+RESET_RECVD, or RECVD state updates on receive side.</t>
 </section>
 <section title='QUIC_EVENT_STREAM_MAX_STREAM'>
 <t>This notification is delivered when a MAX_STREAMS frame is received. It
@@ -950,6 +957,9 @@ attempt to open the stream again.</t>
 <sourcecode type='language C'>
 uint64_t max_stream;
 </sourcecode>
+<t>It indicates the maximum stream limit for a specific stream byte. The
+stream type is encoded in the first 2 bits, and the maximum stream limit
+is calculated by shifting max_stream right by 2 bits.</t>
 </section>
 <section title='QUIC_EVENT_CONNECTION_CLOSE'>
 <t>This notification is delivered when a CLOSE frame is received from the
@@ -963,30 +973,33 @@ struct quic_connection_close {
   uint8_t phrase[];
 };
 </sourcecode>
+<t>errcode: Error code for the application protocol.</t>
+<t>phrase: Optional string for additional details.</t>
+<t>frame: Frame type that caused the closure.</t>
 </section>
 <section title='QUIC_EVENT_CONNECTION_MIGRATION'>
 <t>This notification is delivered when either side successfully changes its
 source address using the CONNECTION_MIGRATION socket option
 <xref target='sockopt_migration'/>, or when the destination address is
-changed by the peer's connection migration. The notification includes a
-parameter indicating whether the migration was local or initiated by the
-peer. After receiving this notification, the new address can be retrieved
-using getsockname() for the local address or getpeername() for the peer's
-address.</t>
+changed by the peer's connection migration.</t>
 <t>Data format in the event</t>
 <sourcecode type='language C'>
 uint8_t local_migration;
 </sourcecode>
+<t>It indicates whether the migration was local or initiated by the peer.
+After receiving this notification, the new address can be retrieved using
+getsockname() for the local address or getpeername() for the peer's
+address.</t>
 </section>
 <section title='QUIC_EVENT_KEY_UPDATE'>
 <t>This notification is delivered when both sides have successfully updated
 to the new key phase after a key update via the KEY_UPDATE socket option
-<xref target='sockopt_key_update'/> on either side. The parameter
-indicates which key phase is currently in use.</t>
+<xref target='sockopt_key_update'/> on either side.</t>
 <t>Data format in the event</t>
 <sourcecode type='language C'>
 uint8_t key_update_phase;
 </sourcecode>
+<t>It indicates which key phase is currently in use.</t>
 </section>
 <section title='QUIC_EVENT_NEW_TOKEN' anchor='event_new_token'>
 <t>This notification is delivered whenever a NEW_TOKEN frame is received
@@ -995,8 +1008,9 @@ tokens using the TOKEN socket option
 <xref target='sockopt_new_token'/>.</t>
 <t>Data format in the event</t>
 <sourcecode type='language C'>
-uint8_t *token;
+uint8_t token[];
 </sourcecode>
+<t>It carries the token data.</t>
 </section>
 <section title='QUIC_EVENT_NEW_SESSION_TICKET'
   anchor='event_new_session_ticket'>
@@ -1004,8 +1018,9 @@ uint8_t *token;
 carried in crypto frame is received from the peer.</t>
 <t>Data format in the event</t>
 <sourcecode type='language C'>
-uint8_t *ticket;
+uint8_t ticket[];
 </sourcecode>
+<t>It carries the data of the TLS session ticket message.</t>
 </section>
 </section>
 
