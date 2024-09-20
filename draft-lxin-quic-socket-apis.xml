@@ -871,6 +871,7 @@ enum quic_event_type {
   QUIC_EVENT_NONE,
   QUIC_EVENT_STREAM_UPDATE,
   QUIC_EVENT_STREAM_MAX_STREAM,
+  QUIC_EVENT_CONNECTION_ID,
   QUIC_EVENT_CONNECTION_CLOSE,
   QUIC_EVENT_CONNECTION_MIGRATION,
   QUIC_EVENT_KEY_UPDATE,
@@ -960,6 +961,25 @@ uint64_t max_stream;
 <t>It indicates the maximum stream limit for a specific stream byte. The
 stream type is encoded in the first 2 bits, and the maximum stream limit
 is calculated by shifting max_stream right by 2 bits.</t>
+</section>
+<section title='QUIC_EVENT_CONNECTION_ID'>
+<t>This notification is delivered when any source or destination connection
+IDs are retired. This usually occurs during connection migration or when
+managing connection IDs via the CONNECTION_ID socket option
+<xref target='sockopt_connid'/>.</t>
+<t>Data format in the event</t>
+<sourcecode type='language C'>
+struct quic_connection_id_info {
+  uint8_t  dest;
+  uint32_t active;
+  uint32_t prior_to;
+};
+</sourcecode>
+<ul>
+<li>dest: Indicates whether to operate on destination connection IDs.</li>
+<li>active: The number of the connection ID in use.</li>
+<li>prior_to: The lowest connection ID number.</li>
+</ul>
 </section>
 <section title='QUIC_EVENT_CONNECTION_CLOSE'>
 <t>This notification is delivered when a CLOSE frame is received from the
@@ -1059,31 +1079,6 @@ see the rest of this section.</t>
 <t>This socket option is used to set a specific notification option.
 For a detailed description of this option and its usage, please refer
 to <xref target='sockopt_event'/>.</t>
-</section>
-<section title='QUIC_SOCKOPT_CONNECTION_CLOSE' anchor='sockopt_close'>
-<t>This option is used to get or set the close context, which includes
-errcode, phrase, and frame. On the closing side, set it before calling
-close() to tell the peer the closing information. On the side being closed,
-get it to receive the peer's closing information.</t>
-<ul>
-<li>On the closing side: Set this option before calling close() to
-communicate the closing information to the peer.</li>
-<li>On the receiving side: Get this option to retrieve the closing
-information from the peer.</li>
-</ul>
-<t>The optval type is</t>
-<sourcecode type='language C'>
-struct quic_connection_close {
-  uint32_t errcode;
-  uint8_t frame;
-  uint8_t phrase[];
-};
-</sourcecode>
-<ul>
-<li>errcode: Error code for the application protocol. Defaults to 0.</li>
-<li>phrase: Optional string for additional details. Defaults to null.</li>
-<li>frame: Frame type that caused the closure. Defaults to 0.</li>
-</ul>
 </section>
 <section title='QUIC_SOCKOPT_TRANSPORT_PARAM'>
 <t>This option is used to configure QUIC transport parameters.</t>
@@ -1189,9 +1184,9 @@ struct quic_config {
 <li><t>receive_session_ticket (in sec):</t>
   <t>This option is for Client-side kernel consumers only, enabling
   userspace handshake to receive session ticket, either via event
-  NEW_SESSION_TICKET <xref target='event_new_session_ticket'/> or socket
-  option SESSION_TICKET <xref target='sockopt_session_ticket'/> and then
-  set back to kernel via socket option SESSION_TICKET.</t>
+  NEW_SESSION_TICKET <xref target='event_new_session_ticket'/> or the
+  socket option SESSION_TICKET <xref target='sockopt_session_ticket'/>
+  and then set back to kernel via the socket option SESSION_TICKET.</t>
   <ul>
   <li>0: disabled (by default)</li>
   <li>!0: maximum time (in sec) to wait</li>
@@ -1207,6 +1202,56 @@ struct quic_config {
   <li>2: REQUIRE</li>
   </ul>
 </li>
+</ul>
+</section>
+<section title='QUIC_SOCKOPT_CONNECTION_ID' anchor='sockopt_connid'>
+<t>This option is used to get or set the source and destination connection
+IDs, including dest, active and prior_to. Along with
+the active_connection_id_limit in the transport parameters, it helps
+determine the range of available connection IDs.</t>
+<t>The optval type is</t>
+<sourcecode type='language C'>
+struct quic_connection_id_info {
+  uint8_t  dest;
+  uint32_t active;
+  uint32_t prior_to;
+};
+</sourcecode>
+<ul>
+<li>dest: Indicates whether to operate on destination connection IDs.</li>
+<li>active: The number of the connection ID in use.</li>
+<li>prior_to: The lowest connection ID number.</li>
+</ul>
+<t>The active field is used to switch the connection ID in use. The
+prior_to field, for source connection IDs, specifies prior to which ID
+will be retired by sending NEW_CONNECTION_ID frames; for destination
+connection IDs, it indicates prior to which ID issued by the peer will
+no longer be used and should be retired by sending RETIRE_CONNECTION_ID
+frames.</t>
+</section>
+<section title='QUIC_SOCKOPT_CONNECTION_CLOSE' anchor='sockopt_close'>
+<t>This option is used to get or set the close context, which includes
+errcode, phrase, and frame. On the closing side, set it before calling
+close() to tell the peer the closing information. On the side being closed,
+get it to receive the peer's closing information.</t>
+<ul>
+<li>On the closing side: Set this option before calling close() to
+communicate the closing information to the peer.</li>
+<li>On the receiving side: Get this option to retrieve the closing
+information from the peer.</li>
+</ul>
+<t>The optval type is</t>
+<sourcecode type='language C'>
+struct quic_connection_close {
+  uint32_t errcode;
+  uint8_t frame;
+  uint8_t phrase[];
+};
+</sourcecode>
+<ul>
+<li>errcode: Error code for the application protocol. Defaults to 0.</li>
+<li>phrase: Optional string for additional details. Defaults to null.</li>
+<li>frame: Frame type that caused the closure. Defaults to 0.</li>
 </ul>
 </section>
 <section title='QUIC_SOCKOPT_TOKEN' anchor='sockopt_new_token'>
