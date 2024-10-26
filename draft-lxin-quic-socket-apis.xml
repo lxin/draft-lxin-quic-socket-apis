@@ -823,6 +823,7 @@ struct quic_stream_info {
   <li>MSG_STREAM_FIN: Send the last data and close the stream.</li>
   <li>MSG_STREAM_UNI: Open the next unidirectional stream.</li>
   <li>MSG_STREAM_DONTWAIT: Open the stream without blocking.</li>
+  <li>MSG_STREAM_SNDBLOCK: Send streams blocked when no capacity.</li>
   </ul>
 </li>
 </ul>
@@ -1126,6 +1127,7 @@ struct quic_config {
   uint32_t    payload_cipher_type;
   uint8_t     receive_session_ticket;
   uint8_t     certificate_request;
+  uint8_t     stream_data_nodelay;
 };
 </sourcecode>
 <ul>
@@ -1200,6 +1202,13 @@ struct quic_config {
   <li>0: IGNORE (by default)</li>
   <li>1: REQUEST</li>
   <li>2: REQUIRE</li>
+  </ul>
+</li>
+<li><t>stream_data_nodelay:</t>
+  <t>This option is to disable the Nagle algorithm, options include:</t>
+  <ul>
+  <li>0: Enable the Nagle algorithm (by default)</li>
+  <li>!0: disable the Nagle algorithm</li>
   </ul>
 </li>
 </ul>
