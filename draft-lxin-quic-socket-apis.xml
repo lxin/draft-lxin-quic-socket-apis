@@ -1751,7 +1751,7 @@ static int do_server(int argc, char *argv[])
 
     if (argc &lt; 5) {
         printf("%s server &lt;LOCAL ADDR> &lt;LOCAL PORT>"
-               "&lt;PRIVATE_KEY_FILE> &lt;CERTIFICATE_FILE> [ALPN]\n",
+               " &lt;PRIVATE_KEY_FILE> &lt;CERTIFICATE_FILE> [ALPN]\n",
                argv[0]);
         return 0;
     }
@@ -2260,7 +2260,7 @@ static int do_server(int argc, char *argv[])
 
     if (argc &lt; 5) {
         printf("%s server &lt;LOCAL ADDR> &lt;LOCAL PORT> "
-               "&lt;PRIVATE_KEY_FILE> &lt;CERTIFICATE_FILE>\n",
+               " &lt;PRIVATE_KEY_FILE> &lt;CERTIFICATE_FILE>\n",
                argv[0]);
         return 0;
     }
@@ -2389,7 +2389,7 @@ int main(int argc, char *argv[])
   anchor='example_kernel'>
 <t>In-kernel QUIC facilitates integration with kernel consumers. Below is
 the design architecture for handling QUIC handshakes in Linux kernel:</t>
-<sourcecode type='language C'>
+<sourcecode type='ascii-art'>
 ┌──────┐  ┌──────┐
 │ APP1 │  │ APP2 │ ...
 └──────┘  └──────┘
@@ -2401,20 +2401,20 @@ the design architecture for handling QUIC handshakes in Linux kernel:</t>
                        [SOCKOPT_TRANSPORT_PARAM_EXT]    │   ^
               │ ^                  │ ^                  │   │
 Userspace     │ │                  │ │                  │   │
-──────────────│─│──────────────────│─│──────────────────│───│────────
+──────────────│─│──────────────────│─│──────────────────│───│───────
 Kernel        │ │                  │ │                  │   │
               v │                  v │                  v   │
-┌──────────────────────────────────────────┐       ┌─────────────┐
-│ socket (IPPROTO_QUIC) |     protocol     │&lt;──┐   │ handshake   │
-├──────────────────────────────────────────┤   │   │netlink APIs │
-│ stream | connid | cong  | path  | timer  │   │   └─────────────┘
-├──────────────────────────────────────────┤   │      │       │
-│  packet  |  frame  |  crypto  |  pnspace │   │   ┌─────┐ ┌─────┐
-├──────────────────────────────────────────┤   │   │     │ │     │
-│        input       |       output        │   │───│ SMB │ │ NFS │...
-├──────────────────────────────────────────┤   │   │     │ │     │
-│                UDP tunnels               │   │   └─────┘ └─────┘
-└──────────────────────────────────────────┘   └──────┴───────┘
+┌──────────────────┬───────────────────────┐       ┌─────────────┐
+│ protocol, timer, │ socket (IPPROTO_QUIC) │&lt;──┐   │ handshake   │
+│                  ├───────────────────────┤   │   │netlink APIs │
+│ common, family,  │ outqueue  |  inqueue  │   │   └─────────────┘
+│                  ├───────────────────────┤   │      │       │
+│ stream, connid,  │         frame         │   │   ┌─────┐ ┌─────┐
+│                  ├───────────────────────┤   │   │     │ │     │
+│ path, pnspace,   │         packet        │   │───│ SMB │ │ NFS │...
+│                  ├───────────────────────┤   │   │     │ │     │
+│ cong, crypto     │       UDP tunnels     │   │   └─────┘ └─────┘
+└──────────────────┴───────────────────────┘   └──────┴───────┘
 </sourcecode>
 </section>
 </back>
