@@ -4,7 +4,7 @@
 <rfc
   xmlns:xi='http://www.w3.org/2001/XInclude'
   category='std'
-  docName='draft-lxin-quic-socket-apis-01'
+  docName='draft-lxin-quic-socket-apis-02'
   ipr='trust200902'
   submissionType='IETF'
   consensus='true'
@@ -15,7 +15,7 @@
 <title abbrev='QUIC socket APIs'>
   Sockets API Extensions for In-kernel QUIC Implementations</title>
 
-<seriesInfo name='Internet-Draft' value='draft-lxin-quic-socket-apis-01'/>
+<seriesInfo name='Internet-Draft' value='draft-lxin-quic-socket-apis-02'/>
 
 <author fullname='Xin Long' initials='L' role='editor' surname='Xin'>
   <organization>Red Hat</organization>
@@ -55,7 +55,7 @@ surname='Leitner'>
   </address>
 </author>
 
-<date year='2024'/>
+<date year='2025'/>
 
 <area>Web and Internet Transport</area>
 <workgroup>Internet Engineering Task Force</workgroup>

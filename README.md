@@ -1,4 +1,4 @@
-# QUIC IETF Draft Documents
+# Sockets API Extensions for In-kernel QUIC Implementations
 
 To validate or convert XML files into text, HTML or PDF formats, you can
 use the IETF Author Tools available at https://author-tools.ietf.org/.
