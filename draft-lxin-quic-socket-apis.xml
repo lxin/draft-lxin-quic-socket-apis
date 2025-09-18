@@ -790,7 +790,7 @@ and describes QUIC stream information about a received message via
 recvmsg(). It uses struct quic_stream_info</t>
 <sourcecode type='language C'>
 struct quic_stream_info {
-  uint64_t stream_id;
+  int64_t stream_id;
   uint32_t stream_flags;
 };
 </sourcecode>
@@ -934,7 +934,7 @@ userspace:</t>
 <t>Data format in the event</t>
 <sourcecode type='language C'>
 struct quic_stream_update {
-  uint64_t id;
+  int64_t id;
   uint32_t state;
   uint32_t errcode;
   uint64_t finalsz;
@@ -1424,7 +1424,7 @@ connection.</t>
 <t>The optval type is</t>
 <sourcecode type='language C'>
 struct quic_stream_info {
-  uint64_t stream_id;
+  int64_t stream_id;
   uint32_t stream_flags;
 };
 </sourcecode>
@@ -1457,7 +1457,7 @@ of data associated with that stream.</t>
 <t>The optval type is</t>
 <sourcecode type='language C'>
 struct quic_errinfo {
-  uint64_t stream_id;
+  int64_t stream_id;
   uint32_t errcode;
 };
 </sourcecode>
@@ -1476,7 +1476,7 @@ stream.</t>
 <t>The optval type is</t>
 <sourcecode type='language C'>
 struct quic_errinfo {
-  uint64_t stream_id;
+  int64_t stream_id;
   uint32_t errcode;
 };
 </sourcecode>
