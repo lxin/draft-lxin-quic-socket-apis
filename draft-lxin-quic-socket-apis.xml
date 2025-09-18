@@ -1467,6 +1467,41 @@ struct quic_stream_info {
 </li>
 </ul>
 </section>
+<section title='QUIC_SOCKOPT_STREAM_PEELOFF'>
+<t>This socket option is used to peel off a QUIC stream. It allows an
+application to detach an individual QUIC stream from its parent connection
+and obtain a dedicated socket for that stream.</t>
+<t>The optval type is</t>
+<sourcecode type='language C'>
+struct quic_stream_peeloff {
+  int64_t stream_id;
+  uint32_t flags;
+  int sd;
+};
+</sourcecode>
+<ul>
+<li>stream_id: Specifies the ID of the stream to be peeled off.</li>
+<li>flags: Specifies flags for file descriptor creation
+(e.g., O_CLOEXEC).</li>
+<li>sd: The new file descriptor returned to the application.</li>
+</ul>
+<t>With this peeled-off socket, applications can operate on the stream
+using the standard socket APIs, such as sendmsg(), recvmsg() (without
+requiring msg_control for stream IDs as in <xref target='struct_stream'/>),
+or send(), recv(), read(), and write() in a way similar to TCP.</t>
+<t>The implementation SHOULD also support the following interfaces:</t>
+<ul>
+<li>poll(): Return the mask based on both the stream state and the parent
+socket state.</li>
+<li>close(): If permitted by the stream state and the parent socket state,
+send a FIN on a sending stream and a STOP_SENDING frame on a receiving
+stream.</li>
+<li>shutdown(): If permitted by the stream state and the parent socket
+state, send a FIN on a sending stream with SHUT_RD, a STOP_SENDING frame
+on a receiving stream with SHUT_WR, or both with SHUT_RDWR.</li>
+</ul>
+<t>An example is provided in <xref target='example_stream_peeloff'/>.</t>
+</section>
 </section>
 
 <section title='Write-Only Options'>
@@ -1811,6 +1846,209 @@ static int do_server(int argc, char *argv[])
         return -1;
     }
     printf("send %d, sid: %lu\n", ret, sid);
+
+    close(sockfd);
+    close(listenfd);
+    return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    if (argc &lt; 2 || (strcmp(argv[1], "server") &amp;&amp;
+        strcmp(argv[1], "client"))) {
+        printf("%s server|client ...\n", argv[0]);
+        return 0;
+    }
+
+    if (!strcmp(argv[1], "client"))
+        return do_client(argc, argv);
+
+    return do_server(argc, argv);
+}
+</sourcecode>
+</section>
+
+<section title='Example For Stream Peeloff Usage'
+anchor='example_stream_peeloff'>
+<t>This example shows how to use the QUIC_SOCKOPT_STREAM_PEELOFF socket
+option to create a new socket bound to a specific QUIC stream, which can
+then be managed using the standard socket APIs in the same way as TCP.</t>
+<sourcecode type='language C'>
+#include &lt;sys/socket.h>
+#include &lt;arpa/inet.h>
+#include &lt;string.h>
+#include &lt;unistd.h>
+#include &lt;stdlib.h>
+#include &lt;stdio.h>
+#include &lt;errno.h>
+
+#include &lt;netinet/quic.h>
+
+static int do_client(int argc, char *argv[])
+{
+    struct quic_stream_peeloff pinfo = {};
+    struct quic_stream_info sinfo = {};
+    struct sockaddr_in ra = {};
+    int ret, sockfd, strmfd;
+    unsigned int optlen;
+    const char *rc;
+    char msg[50];
+
+    if (argc &lt; 3) {
+        printf("%s client &lt;PEER ADDR> &lt;PEER PORT> [ALPN]\n",
+               argv[0]);
+        return 0;
+    }
+
+    sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_QUIC);
+    if (sockfd &lt; 0) {
+        printf("socket create failed\n");
+        return -1;
+    }
+
+    ra.sin_family = AF_INET;
+    ra.sin_port = htons(atoi(argv[3]));
+    inet_pton(AF_INET, argv[2], &amp;ra.sin_addr.s_addr);
+
+    if (connect(sockfd, (struct sockaddr *)&amp;ra, sizeof(ra))) {
+        printf("socket connect failed\n");
+        return -1;
+    }
+
+    if (quic_client_handshake(sockfd, NULL, NULL, argv[4]))
+        return -1;
+
+    /* open a unidirectional stream */
+    optlen = sizeof(sinfo);
+    sinfo.stream_id = -1;
+    sinfo.stream_flags = MSG_STREAM_UNI;
+    ret = getsockopt(sockfd, SOL_QUIC, QUIC_SOCKOPT_STREAM_OPEN,
+                     &amp;sinfo, &amp;optlen);
+    if (ret) {
+        printf("getsockopt stream_open failed\n");
+        return -1;
+    }
+
+    /* peel off the stream */
+    optlen = sizeof(pinfo);
+    pinfo.stream_id = sinfo.stream_id;
+    strmfd = getsockopt(sockfd, SOL_QUIC,
+                        QUIC_SOCKOPT_STREAM_PEELOFF,
+                        &amp;pinfo, &amp;optlen);
+    if (strmfd &lt; 0) {
+        printf("getsockopt stream_peeloff failed %d\n", strmfd);
+        return -1;
+    }
+
+    /* send data on the peeled off stream */
+    strcpy(msg, "hello quic server!");
+    ret = send(strmfd, msg, strlen(msg), 0);
+    if (ret == -1) {
+        printf("send error %d %d\n", ret, errno);
+        return -1;
+    }
+    printf("send '%s' on stream %d\n", msg, (int)pinfo.stream_id);
+    close(strmfd);
+
+    recv(sockfd, NULL, 0, 0);
+    close(sockfd);
+    return 0;
+}
+
+static int do_server(int argc, char *argv[])
+{
+    struct quic_stream_peeloff pinfo = {};
+    unsigned int addrlen, flags, optlen;
+    int listenfd, sockfd, strmfd, ret;
+    struct quic_event_option event;
+    struct sockaddr_in sa = {};
+    union quic_event *ev;
+    const char *rc;
+    char msg[50];
+
+    if (argc &lt; 5) {
+        printf("%s server &lt;LOCAL ADDR> &lt;LOCAL PORT>"
+               " &lt;PRIVATE_KEY_FILE> &lt;CERTIFICATE_FILE> [ALPN]\n",
+               argv[0]);
+        return 0;
+    }
+
+    sa.sin_family = AF_INET;
+    sa.sin_port = htons(atoi(argv[3]));
+    inet_pton(AF_INET, argv[2], &amp;sa.sin_addr.s_addr);
+    listenfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_QUIC);
+    if (listenfd &lt; 0) {
+        printf("socket create failed\n");
+        return -1;
+    }
+    if (bind(listenfd, (struct sockaddr *)&amp;sa, sizeof(sa))) {
+        printf("socket bind failed\n");
+        return -1;
+    }
+    if (listen(listenfd, 1)) {
+        printf("socket listen failed\n");
+        return -1;
+    }
+    addrlen = sizeof(sa);
+    sockfd = accept(listenfd, (struct sockaddr *)&amp;sa, &amp;addrlen);
+    if (sockfd &lt; 0) {
+        printf("socket accept failed %d %d\n", errno, sockfd);
+        return -1;
+    }
+
+    if (quic_server_handshake(sockfd, argv[4], argv[5], argv[6]))
+        return -1;
+
+    /* enable stream update event */
+    event.type = QUIC_EVENT_STREAM_UPDATE;
+    event.on = 1;
+    ret = setsockopt(sockfd, SOL_QUIC, QUIC_SOCKOPT_EVENT, &amp;event,
+                     sizeof(event));
+    if (ret == -1) {
+        printf("socket setsockopt event error %d\n", errno);
+        return -1;
+    }
+
+    while (1) {
+        /* wait for stream update event for new recv stream */
+        flags = 0;
+        memset(msg, 0, sizeof(msg));
+        ret = quic_recvmsg(sockfd, msg, sizeof(msg) - 1, NULL,
+                           &amp;flags);
+        if (ret == -1) {
+            printf("recv error %d %d\n", ret, errno);
+            return 1;
+        }
+        if (!(flags &amp; MSG_NOTIFICATION) ||
+            msg[0] != QUIC_EVENT_STREAM_UPDATE)
+            continue;
+        ev = (union quic_event *)&amp;msg[1];
+        if (ev->update.state != QUIC_STREAM_RECV_STATE_RECV)
+            continue;
+
+        /* peel off the stream */
+        optlen = sizeof(pinfo);
+        pinfo.stream_id = ev->update.id;
+        strmfd = getsockopt(sockfd, SOL_QUIC,
+                            QUIC_SOCKOPT_STREAM_PEELOFF,
+                            &amp;pinfo, &amp;optlen);
+        if (strmfd &lt; 0) {
+            printf("getsockopt stream_peeloff failed %d\n", ret);
+            return -1;
+        }
+
+        /* read data from the peeled off stream */
+        memset(msg, 0, sizeof(msg));
+        ret = recv(strmfd, msg, sizeof(msg) - 1, 0);
+        if (ret == -1) {
+            printf("recv error %d %d\n", ret, errno);
+            return 1;
+        }
+        printf("recv '%s' on stream %d\n", msg,
+               (int)pinfo.stream_id);
+        close(strmfd);
+        break;
+    }
 
     close(sockfd);
     close(listenfd);
