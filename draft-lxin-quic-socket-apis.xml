@@ -871,6 +871,7 @@ tokens. These events are categorized under the quic_event_type enum:</t>
 enum quic_event_type {
   QUIC_EVENT_NONE,
   QUIC_EVENT_STREAM_UPDATE,
+  QUIC_EVENT_STREAM_MAX_DATA,
   QUIC_EVENT_STREAM_MAX_STREAM,
   QUIC_EVENT_CONNECTION_ID,
   QUIC_EVENT_CONNECTION_CLOSE,
@@ -947,6 +948,23 @@ RESET_SENT or RESET_RECVD state update on send side, and for the
 RESET_RECVD update on receive side.</t>
 <t>finalsz: The final size of the stream. It is used for the SIZE_KNOWN,
 RESET_RECVD, or RECVD state updates on receive side.</t>
+</section>
+<section title='QUIC_EVENT_STREAM_MAX_DATA'>
+<t>This notification is delivered when a MAX_STREAM_DATA frame is received.
+If a stream is blocked, a non-blocking sendmsg() call will return ENOSPC.
+This event notifies the application when additional send space becomes
+available for a stream, allowing applications to adjust stream scheduling
+accordingly.</t>
+<t>Data format in the event</t>
+<sourcecode type='language C'>
+struct quic_stream_max_data {
+  int64_t id;
+  uint64_t max_data;
+};
+</sourcecode>
+<t>id: The stream ID.</t>
+<t>max_data: The updated maximum amount of data that can be sent on the
+stream.</t>
 </section>
 <section title='QUIC_EVENT_STREAM_MAX_STREAM'>
 <t>This notification is delivered when a MAX_STREAMS frame is received. It
