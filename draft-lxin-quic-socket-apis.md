@@ -461,9 +461,10 @@ provided by Stream or Handshake msg_control. While sending, the flags
 function as intended; however, when receiving, applications will not be
 able to obtain any flags from the kernel.
 
-send() can transmit data as datagram messages when MSG_DATAGRAM is set
-in the flags, and as stream messages on the most recently opened stream
-if MSG_DATAGRAM is not set. However, it cannot send handshake messages.
+send() can transmit data as datagram messages when MSG_QUIC_DATAGRAM is
+set in the flags, and as stream messages on the most recently opened
+stream if MSG_QUIC_DATAGRAM is not set. However, it cannot send
+handshake messages.
 
 recv() can receive datagram, stream, or event messages, but it cannot
 determine the message type or stream ID without the appropriate flags
@@ -741,7 +742,7 @@ On send side:
   - **MSG_MORE**: Indicates that data will be held until the next data
     is sent without this flag.
   - **MSG_DONTWAIT**: Prevents blocking if there is no send buffer.
-  - **MSG_DATAGRAM**: Sends data as an unreliable datagram.
+  - **MSG_QUIC_DATAGRAM**: Sends data as an unreliable datagram.
 
   Additionally, the flags can also be set to the values in stream_flags
   on the send side {{struct_stream}} if Stream msg_control is not being
@@ -757,8 +758,9 @@ On receive side:
     buffer.
 - msg_flags of msghdr returned from the kernel might be set to:
   - **MSG_EOR**: Indicates that the received data is read completely.
-  - **MSG_DATAGRAM**: Indicates that the received data is a datagram.
-  - **MSG_NOTIFICATION**: Indicates that the received data is a
+  - **MSG_QUIC_DATAGRAM**: Indicates that the received data is a
+    datagram.
+  - **MSG_QUIC_NOTIFICATION**: Indicates that the received data is a
     notification message.
 
   Additionally, the flags might also be set to the values in
@@ -878,10 +880,10 @@ On send side:
 
 - **stream_id**:
   - **-1**: The system opens a stream based on stream_flags:
-    - If MSG_STREAM_NEW is set: Open the next bidirectional stream and
-      uses it for sending data.
-    - If both MSG_STREAM_NEW and MSG_STREAM_UNI are set: Opens the next
-      unidirectional stream and uses it for sending data.
+    - If MSG_QUIC_STREAM_NEW is set: Open the next bidirectional stream
+      and uses it for sending data.
+    - If both MSG_QUIC_STREAM_NEW and MSG_QUIC_STREAM_UNI are set: Opens
+      the next unidirectional stream and uses it for sending data.
     - Otherwise: Use the latest opened stream for sending data.
   - **!-1**: The specified stream ID is used with the first 2 bits:
     - QUIC_STREAM_TYPE_SERVER_MASK(0x1): Indicates if it is a
@@ -890,19 +892,19 @@ On send side:
       unidirectional stream.
 
 - **stream_flags**:
-  - MSG_STREAM_NEW: Open a stream and send the first data.
-  - MSG_STREAM_FIN: Send the last data and close the stream.
-  - MSG_STREAM_UNI: Open the next unidirectional stream.
-  - MSG_STREAM_DONTWAIT: Open the stream without blocking.
-  - MSG_STREAM_SNDBLOCK: Send streams blocked when no capacity.
+  - MSG_QUIC_STREAM_NEW: Open a stream and send the first data.
+  - MSG_QUIC_STREAM_FIN: Send the last data and close the stream.
+  - MSG_QUIC_STREAM_UNI: Open the next unidirectional stream.
+  - MSG_QUIC_STREAM_DONTWAIT: Open the stream without blocking.
+  - MSG_QUIC_STREAM_SNDBLOCK: Send streams blocked when no capacity.
 
 On receive side:
 
 - **stream_id**: Identifies the stream to which the received data
   belongs.
 - **stream_flags**:
-  - MSG_STREAM_FIN: Indicates that the data received is the last one for
-    this stream.
+  - MSG_QUIC_STREAM_FIN: Indicates that the data received is the last
+    one for this stream.
 
 This cmsg is specifically used for sending user stream data, including
 early or 0-RTT data. When sending user unreliable datagrams, this cmsg
@@ -950,8 +952,8 @@ enum quic_event_type {
 ~~~
 
 When a notification arrives, recvmsg() returns the notification in the
-application-supplied data buffer via msg_iov and sets MSG_NOTIFICATION
-in msg_flags of msghdr in {{struct_stream}}.
+application-supplied data buffer via msg_iov and sets
+MSG_QUIC_NOTIFICATION in msg_flags of msghdr in {{struct_stream}}.
 
 The first byte of the received data indicates the type of the event,
 corresponding to one of the values in the quic_event_type enum. The
@@ -1052,10 +1054,11 @@ struct quic_stream_max_data {
 ### QUIC_EVENT_STREAM_MAX_STREAM
 
 This notification is delivered when a MAX_STREAMS frame is received. It
-is particularly useful when using MSG_STREAM_DONTWAIT stream_flags to
-open a stream via the STREAM_OPEN socket option {{sockopt_stream_open}}
-whose ID exceeds the current maximum stream count. After receiving this
-notification, the application SHOULD attempt to open the stream again.
+is particularly useful when using MSG_QUIC_STREAM_DONTWAIT stream_flags
+to open a stream via the STREAM_OPEN socket option
+{{sockopt_stream_open}} whose ID exceeds the current maximum stream
+count. After receiving this notification, the application SHOULD attempt
+to open the stream again.
 
 Data format in the event:
 
@@ -1582,9 +1585,9 @@ struct quic_stream_info {
 
 - **stream_flags**: Specifies flags for stream creation. It can be set
   to:
-  - QUIC_STREAM_UNI: Open the next unidirectional stream.
-  - QUIC_STREAM_DONTWAIT: Open the stream without blocking; this allows
-    the request to be processed asynchronously.
+  - MSG_QUIC_STREAM_UNI: Open the next unidirectional stream.
+  - MSG_QUIC_STREAM_DONTWAIT: Open the stream without blocking; this
+    allows the request to be processed asynchronously.
 
 ### QUIC_SOCKOPT_STREAM_PEELOFF
 
@@ -1799,13 +1802,13 @@ static int do_client(int argc, char *argv[])
         return -1;
 
     /* Open stream 0 and send first data on stream 0 with
-     * MSG_STREAM_NEW, or call getsockopt(QUIC_SOCKOPT_STREAM_OPEN)
-     * to open a stream and then send data with out MSG_STREAM_NEW
+     * MSG_QUIC_STREAM_NEW, or call getsockopt(QUIC_SOCKOPT_STREAM_OPEN)
+     * to open a stream and then send data with out MSG_QUIC_STREAM_NEW
      * needed
      */
     strcpy(msg, "hello ");
     sid = 0;
-    flags = MSG_STREAM_NEW;
+    flags = MSG_QUIC_STREAM_NEW;
     ret = quic_sendmsg(sockfd, msg, strlen(msg), sid, flags);
     if (ret == -1) {
         printf("send error %d %d\n", ret, errno);
@@ -1816,7 +1819,7 @@ static int do_client(int argc, char *argv[])
     /* Open stream 2 and send first data on stream 2 */
     strcpy(msg, "hello quic ");
     sid = 2;
-    flags = MSG_STREAM_NEW;
+    flags = MSG_QUIC_STREAM_NEW;
     ret = quic_sendmsg(sockfd, msg, strlen(msg), sid, flags);
     if (ret == -1) {
         printf("send error %d %d\n", ret, errno);
@@ -1836,11 +1839,11 @@ static int do_client(int argc, char *argv[])
     stream[sid >> 1].len += ret;
 
     /* Send second (last) data on stream 2 and then close stream
-     * 2 with MSG_STREAM_FIN
+     * 2 with MSG_QUIC_STREAM_FIN
      */
     strcpy(msg, "server stream 2!");
     sid = 2;
-    flags = MSG_STREAM_FIN;
+    flags = MSG_QUIC_STREAM_FIN;
     ret = quic_sendmsg(sockfd, msg, strlen(msg), sid, flags);
     if (ret == -1) {
         printf("send error %d %d\n", ret, errno);
@@ -1851,7 +1854,7 @@ static int do_client(int argc, char *argv[])
     /* Send third (last) data on stream 0 */
     strcpy(msg, "server stream 0!");
     sid = 0;
-    flags = MSG_STREAM_FIN;
+    flags = MSG_QUIC_STREAM_FIN;
     ret = quic_sendmsg(sockfd, msg, strlen(msg), sid, flags);
     if (ret == -1) {
         printf("send error %d %d\n", ret, errno);
@@ -1921,8 +1924,8 @@ static int do_server(int argc, char *argv[])
     if (quic_server_handshake(sockfd, argv[4], argv[5], argv[6]))
         return -1;
 
-    while (!(stream[0].flags & MSG_STREAM_FIN) ||
-           !(stream[1].flags & MSG_STREAM_FIN)) {
+    while (!(stream[0].flags & MSG_QUIC_STREAM_FIN) ||
+           !(stream[1].flags & MSG_QUIC_STREAM_FIN)) {
         flags = 0;
         ret = quic_recvmsg(sockfd, msg, sizeof(msg), &sid, &flags);
         if (ret == -1) {
@@ -1943,7 +1946,7 @@ static int do_server(int argc, char *argv[])
 
     strcpy(msg, "hello quic client stream 1!");
     sid = 1;
-    flags = MSG_STREAM_NEW | MSG_STREAM_FIN;
+    flags = MSG_QUIC_STREAM_NEW | MSG_QUIC_STREAM_FIN;
     ret = quic_sendmsg(sockfd, msg, strlen(msg), sid, flags);
     if (ret == -1) {
         printf("send error %d %d\n", ret, errno);
@@ -2024,7 +2027,7 @@ static int do_client(int argc, char *argv[])
     /* open a unidirectional stream */
     optlen = sizeof(sinfo);
     sinfo.stream_id = -1;
-    sinfo.stream_flags = MSG_STREAM_UNI;
+    sinfo.stream_flags = MSG_QUIC_STREAM_UNI;
     ret = getsockopt(sockfd, SOL_QUIC, QUIC_SOCKOPT_STREAM_OPEN,
                      &sinfo, &optlen);
     if (ret) {
@@ -2120,7 +2123,7 @@ static int do_server(int argc, char *argv[])
             printf("recv error %d %d\n", ret, errno);
             return 1;
         }
-        if (!(flags & MSG_NOTIFICATION) ||
+        if (!(flags & MSG_QUIC_NOTIFICATION) ||
             msg[0] != QUIC_EVENT_STREAM_UPDATE)
             continue;
         ev = (union quic_event *)&msg[1];
@@ -2484,7 +2487,7 @@ static int do_client(int argc, char *argv[])
 
     strcpy(msg, "hello quic server!");
     sid = 2;
-    flags = MSG_STREAM_NEW | MSG_STREAM_FIN;
+    flags = MSG_QUIC_STREAM_NEW | MSG_QUIC_STREAM_FIN;
     ret = quic_sendmsg(sockfd, msg, strlen(msg), sid, flags);
     if (ret == -1) {
         printf("send error %d %d\n", ret, errno);
@@ -2549,7 +2552,7 @@ static int do_client(int argc, char *argv[])
     /* send early data before handshake */
     strcpy(msg, "hello quic server, I'm back!");
     sid = 2;
-    flags = MSG_STREAM_NEW | MSG_STREAM_FIN;
+    flags = MSG_QUIC_STREAM_NEW | MSG_QUIC_STREAM_FIN;
     ret = quic_sendmsg(sockfd, msg, strlen(msg), sid, flags);
     if (ret == -1) {
         printf("send error %d %d\n", ret, errno);
@@ -2645,7 +2648,7 @@ static int do_server(int argc, char *argv[])
 
     strcpy(msg, "hello quic client!");
     sid = 1;
-    flags = MSG_STREAM_NEW | MSG_STREAM_FIN;
+    flags = MSG_QUIC_STREAM_NEW | MSG_QUIC_STREAM_FIN;
     ret = quic_sendmsg(sockfd, msg, strlen(msg), sid, flags);
     if (ret == -1) {
         printf("send error %d %d\n", ret, errno);
@@ -2678,7 +2681,7 @@ static int do_server(int argc, char *argv[])
 
     strcpy(msg, "hello quic client! welcome back!");
     sid = 1;
-    flags = MSG_STREAM_NEW | MSG_STREAM_FIN;
+    flags = MSG_QUIC_STREAM_NEW | MSG_QUIC_STREAM_FIN;
     ret = quic_sendmsg(sockfd, msg, strlen(msg), sid, flags);
     if (ret == -1) {
         printf("send error %d %d\n", ret, errno);
