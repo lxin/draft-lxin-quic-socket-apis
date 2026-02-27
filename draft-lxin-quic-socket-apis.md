@@ -1642,8 +1642,8 @@ The implementation SHOULD also support the following interfaces:
   state, send a FIN on a sending stream and a STOP_SENDING frame on a
   receiving stream.
 - **shutdown()**: If permitted by the stream state and the parent socket
-  state, send a FIN on a sending stream with SHUT_RD, a STOP_SENDING
-  frame on a receiving stream with SHUT_WR, or both with SHUT_RDWR.
+  state, send a STOP_SENDING frame on a receiving stream with SHUT_RD,
+  a FIN on a sending stream with SHUT_WR, or both with SHUT_RDWR.
 
 An example is provided in {{example_stream_peeloff}}.
 
