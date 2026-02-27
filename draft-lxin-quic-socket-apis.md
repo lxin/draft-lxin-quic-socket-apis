@@ -294,7 +294,7 @@ and the arguments are:
 
 - **sd**: The socket descriptor of the endpoint.
 - **addr**: The address structure (struct sockaddr_in for an IPv4
-  address or struct sockaddr_in6 for an IPv6 address. See {{RFC3542}}).
+  address or struct sockaddr_in6 for an IPv6 address. See {{RFC3493}}).
 - **addrlen**: The size of the address structure.
 
 The function returns the socket descriptor for the newly formed
@@ -326,7 +326,7 @@ and the arguments are:
 
 - **sd**: The socket descriptor of the endpoint.
 - **addr**: The address structure (struct sockaddr_in for an IPv4
-  address or struct sockaddr_in6 for an IPv6 address. See {{RFC3542}}).
+  address or struct sockaddr_in6 for an IPv6 address. See {{RFC3493}}).
 - **addrlen**: The size of the address structure.
 
 connect() returns 0 on success and -1 on error.
