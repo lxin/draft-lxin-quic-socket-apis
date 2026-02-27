@@ -1698,7 +1698,7 @@ before the handshake.
 The optval type is:
 
 ~~~ c
-struct sockaddr_in(6);
+struct sockaddr_storage;
 ~~~
 
 ### QUIC_SOCKOPT_KEY_UPDATE {#sockopt_key_update}
