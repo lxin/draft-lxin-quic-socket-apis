@@ -1076,7 +1076,7 @@ Data format in the event:
 uint64_t max_stream;
 ~~~
 
-It indicates the maximum stream limit for a specific stream byte. The
+It indicates the maximum stream limit for a specific stream type. The
 stream type is encoded in the first 2 bits, and the maximum stream limit
 is calculated by shifting max_stream right by 2 bits.
 
