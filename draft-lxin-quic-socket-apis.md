@@ -647,7 +647,8 @@ and the arguments are:
 - **hostname**: Server name for Certificate mode.
 - **alpns**: ALPNs supported and split by ','.
 
-These functions return 0 for success and errcode in case of an error.
+These functions return 0 for success and a negative errno in case of
+an error.
 
 ### quic_handshake() {#advanced_do_handshake}
 
