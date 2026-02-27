@@ -1749,23 +1749,57 @@ No actions from IANA are required.
 
 # Security Considerations
 
-The socket receive buffer SHOULD be adjusted according to the max_data
-parameter from the struct quic_transport_param. The implementation
-SHOULD update the socket receive buffer whenever the local transport
-parameter max_data changes. Using a socket receive buffer smaller than
-the local transport parameter max_data MAY impair performance.
+Implementers MUST adhere to all security requirements in {{RFC9000}}.
+This section addresses considerations specific to in-kernel QUIC socket
+implementations.
 
-Similarly, the socket send buffer SHOULD be adjusted based on the peer's
-max_data transport parameter to optimize performance rather than setting
-it manually.
+## Cryptographic Security
 
-Additionally, the size of the optval for the following socket options
-SHOULD be limited to avoid excessive memory allocation:
+- **Handshake and Secret Protection**: The kernel-userspace
+  communication channel MUST be protected against unauthorized access.
+  Cryptographic secrets (QUIC_SOCKOPT_CRYPTO_SECRET) MUST be zeroed
+  after use. Clients MUST validate server certificates including chains,
+  revocation, and hostname verification.
 
-- QUIC_SOCKOPT_ALPN
-- QUIC_SOCKOPT_TOKEN
-- QUIC_SOCKOPT_SESSION_TICKET
-- QUIC_SOCKOPT_CONNECTION_CLOSE
+- **Randomness Requirements**: Connection IDs MUST use cryptographically
+  secure random generation with at least 128 bits of entropy. Stateless
+  reset tokens MUST use HMAC or equivalent with per-connection secret
+  keys.
+
+## Resource Management and DoS Prevention
+
+- **Memory Limits**: Socket buffers SHOULD match max_data transport
+  parameters. Per-stream buffering MUST be limited respecting
+  max_stream_data. Enforce socket option size limits, such as: ALPN
+  (256 bytes), TOKEN (512 bytes), SESSION_TICKET (4096 bytes),
+  CONNECTION_CLOSE phrase (1024 bytes).
+
+- **Connection and Rate Limits**: Limit concurrent connections per
+  source IP, enforce negotiated max_streams limits, and rate-limit
+  connection requests and packets to prevent resource and CPU
+  exhaustion. Respect system resource limits and bound interrupt
+  context processing to prevent kernel exhaustion.
+
+## Attack Prevention and Validation
+
+- **Address and Token Validation**: Servers MUST validate client
+  addresses using validate_peer_address for Retry packets. Tokens MUST
+  be cryptographically validated, include client IP, and expire (e.g.,
+  60 seconds). Limit responses to 3x received data until validation
+  completes per {{RFC9000}}. Clients MUST handle Version Negotiation
+  correctly to prevent downgrade attacks.
+
+- **Input Validation**: All inputs MUST be validated for size,
+  alignment, value ranges (socket options), and protocol compliance
+  (packets, frames, stream IDs) per {{RFC9000}}. Perform permission
+  checks for security-sensitive socket operations.
+
+## 0-RTT Security
+
+- **Replay Protection**: 0-RTT MUST only carry idempotent operations
+  (e.g., HTTP GET). Applications SHOULD implement application-level
+  replay protection for sensitive operations. Session tickets SHOULD
+  have limited lifetime (e.g., 24 hours) with periodic key rotation.
 
 # Appendix A: Example For Multi-streaming Usage {#example_stream}
 
