@@ -900,6 +900,8 @@ On send side:
     - QUIC_STREAM_TYPE_UNI_MASK(0x2): Indicates if it is a
       unidirectional stream.
 
+    See details in {{Section 2.1 of RFC9000}}.
+
 - **stream_flags**:
   - MSG_QUIC_STREAM_NEW: Open a stream and send the first data.
   - MSG_QUIC_STREAM_FIN: Send the last data and close the stream.
