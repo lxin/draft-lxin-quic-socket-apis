@@ -120,6 +120,13 @@ the argument data types from POSIX when possible (e.g., the final
 argument to setsockopt() is a socklen_t value). Whenever buffer sizes
 are specified, the POSIX size_t data type is used.
 
+## Reserved Fields
+
+Many structures contain reserved fields for future extensibility.
+Applications MUST zero reserved fields when sending structures to the
+kernel. Applications MUST ignore reserved fields when receiving
+structures from the kernel, as their values are undefined.
+
 # Interface
 
 A typical QUIC server uses the following socket calls in sequence to
@@ -873,6 +880,7 @@ recvmsg(). It uses struct quic_stream_info:
 struct quic_stream_info {
   int64_t stream_id;
   uint32_t stream_flags;
+  uint32_t reserved;
 };
 ~~~
 
@@ -919,6 +927,7 @@ struct quic_handshake_info:
 ~~~ c
 struct quic_handshake_info {
   uint8_t crypto_level;
+  uint8_t reserved[7];
 };
 ~~~
 
@@ -1016,7 +1025,8 @@ Data format in the event:
 ~~~ c
 struct quic_stream_update {
   int64_t id;
-  uint32_t state;
+  uint8_t state;
+  uint8_t reserved[3];
   uint32_t errcode;
   uint64_t finalsz;
 };
@@ -1082,6 +1092,7 @@ Data format in the event:
 ~~~ c
 struct quic_connection_id_info {
   uint8_t  dest;
+  uint8_t  reserved[3];
   uint32_t active;
   uint32_t prior_to;
 };
@@ -1103,6 +1114,7 @@ Data format in the event:
 struct quic_connection_close {
   uint32_t errcode;
   uint8_t frame;
+  uint8_t reserved[3];
   uint8_t phrase[];
 };
 ~~~
@@ -1235,7 +1247,7 @@ struct quic_transport_param {
   uint64_t max_stream_data_bidi_local;       /* 65536 * 4 */
   uint64_t max_stream_data_bidi_remote;      /* 65536 * 4 */
   uint64_t max_stream_data_uni;              /* 65536 * 4 */
-  uint64_t reserved;
+  uint64_t reserved[4];
 };
 ~~~
 
@@ -1266,7 +1278,7 @@ struct quic_config {
   uint8_t  stream_data_nodelay;
   uint8_t  receive_session_ticket;
   uint8_t  certificate_request;
-  uint8_t  reserved[3];
+  uint8_t  reserved[43];
 };
 ~~~
 
@@ -1354,6 +1366,7 @@ The optval type is:
 ~~~ c
 struct quic_connection_id_info {
   uint8_t  dest;
+  uint8_t  reserved[3];
   uint32_t active;
   uint32_t prior_to;
 };
@@ -1388,6 +1401,7 @@ The optval type is:
 struct quic_connection_close {
   uint32_t errcode;
   uint8_t frame;
+  uint8_t reserved[3];
   uint8_t phrase[];
 };
 ~~~
@@ -1506,6 +1520,7 @@ The optval type is:
 struct quic_crypto_secret {
   uint8_t level;
   uint16_t send;
+  uint16_t reserved;
   uint32_t type;
   uint8_t secret[48];
 };
@@ -1574,6 +1589,7 @@ The optval type is:
 struct quic_stream_info {
   int64_t stream_id;
   uint32_t stream_flags;
+  uint32_t reserved;
 };
 ~~~
 
@@ -1642,6 +1658,7 @@ The optval type is:
 struct quic_errinfo {
   int64_t stream_id;
   uint32_t errcode;
+  uint32_t reserved;
 };
 ~~~
 
@@ -1662,6 +1679,7 @@ The optval type is:
 struct quic_errinfo {
   int64_t stream_id;
   uint32_t errcode;
+  uint32_t reserved;
 };
 ~~~
 
