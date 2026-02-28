@@ -1,49 +1,41 @@
 ---
+docname: draft-lxin-quic-socket-apis-latest
 title: Sockets API Extensions for In-kernel QUIC Implementations
 abbrev: QUIC socket APIs
-docname: draft-lxin-quic-socket-apis-latest
-category: std
+cat: std
 ipr: trust200902
-submissionType: IETF
-consensus: true
+wg: Internet Engineering Task Force
 area: Web and Internet Transport
-workgroup: Internet Engineering Task Force
-keyword: QUIC socket APIs
+submissionType: IETF
 
 author:
-  - fullname: Xin Long
-    initials: L
-    surname: Xin
-    role: editor
-    organization: Red Hat
-    address:
-      street: 20 Deerfield Drive
-      city: Ottawa
-      region: ON
-      country: CA
-    email: lucien.xin@gmail.com
-  - fullname: Moritz Buhl
-    initials: M.
-    surname: Buhl
-    role: editor
-    organization: Technical University of Munich
-    address:
-      street: Boltzmannstrasse 3
-      city: Garching
-      code: 85748
-      country: Germany
-    email: ietf@moritzbuhl.de
-  - fullname: Marcelo Ricardo Leitner
-    initials: M
-    surname: Leitner
-    role: editor
-    organization: Red Hat
-    address:
-      street: Av. Brg. Faria Lima, 3732
-      city: Sao Paolo
-      region: SP
-      country: BR
-    email: mleitner@redhat.com
+-
+   ins: Xin Long
+   name: L. Xin
+   org: Red Hat
+   street: 159 Parkdale Ave
+   city: Ottawa
+   region: Ontario
+   country: Canada
+   email: lucien.xin@gmail.com
+-
+   ins: M. Buhl
+   name: Moritz Buhl
+   org: Technical University of Munich
+   street: Boltzmannstrasse 3
+   code: 85748
+   city: Garching
+   country: Germany
+   email: ietf@moritzbuhl.de
+-
+   ins: M. Leitner
+   name: Marcelo Ricardo Leitner
+   org: Red Hat
+   street: Av. Brg. Faria Lima, 3732
+   city: Sao Paolo
+   region: SP
+   country: Brazil
+   email: mleitner@redhat.com
 
 informative:
   RFC0768:
